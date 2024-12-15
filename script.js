@@ -2,10 +2,15 @@ let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
 function addTask() {
     const input = document.getElementById('taskInput');
+    const priority = document.getElementById('prioritySelect').value;
     const task = input.value.trim();
     
     if (task) {
-        tasks.push({ text: task, completed: false });
+        tasks.push({ 
+            text: task, 
+            completed: false,
+            priority: priority 
+        });
         saveTasks();
         renderTasks();
         input.value = '';
@@ -34,8 +39,11 @@ function renderTasks() {
     
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
+        li.className = `priority-${task.priority}`;
+        if (task.completed) li.classList.add('completed');
+        
         li.innerHTML = `
-            <span class="${task.completed ? 'completed' : ''}" onclick="toggleTask(${index})">${task.text}</span>
+            <span onclick="toggleTask(${index})">${task.text}</span>
             <button onclick="deleteTask(${index})">Delete</button>
         `;
         taskList.appendChild(li);

@@ -37,6 +37,13 @@ input {
     border-radius: 4px;
 }
 
+select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 button {
     padding: 10px 20px;
     background-color: #1a73e8;
@@ -63,6 +70,18 @@ li {
     margin-bottom: 5px;
     background-color: #f8f9fa;
     border-radius: 4px;
+}
+
+li.priority-high {
+    border-left: 4px solid #ff4444;
+}
+
+li.priority-medium {
+    border-left: 4px solid #ffbb33;
+}
+
+li.priority-low {
+    border-left: 4px solid #00C851;
 }
 
 .completed {
