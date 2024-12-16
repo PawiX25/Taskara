@@ -8,6 +8,46 @@ let categories = JSON.parse(localStorage.getItem('categories')) || [
 
 let currentFilter = 'all';
 
+function showConfirmDialog(message, onConfirm) {
+    const modal = document.getElementById('confirmModal');
+    const messageEl = document.getElementById('confirmMessage');
+    messageEl.textContent = message;
+    modal.classList.remove('hidden');
+
+    document.getElementById('confirmCancel').onclick = () => {
+        modal.classList.add('hidden');
+    };
+
+    document.getElementById('confirmOk').onclick = () => {
+        modal.classList.add('hidden');
+        onConfirm();
+    };
+}
+
+function showPromptDialog(title, defaultValue, onConfirm) {
+    const modal = document.getElementById('promptModal');
+    const titleEl = document.getElementById('promptTitle');
+    const input = document.getElementById('promptInput');
+    
+    titleEl.textContent = title;
+    input.value = defaultValue;
+    modal.classList.remove('hidden');
+
+    document.getElementById('promptCancel').onclick = () => {
+        modal.classList.add('hidden');
+    };
+
+    document.getElementById('promptOk').onclick = () => {
+        const value = input.value.trim();
+        if (value) {
+            modal.classList.add('hidden');
+            onConfirm(value);
+        }
+    };
+
+    input.focus();
+}
+
 function addTask() {
     const input = document.getElementById('taskInput');
     const priority = document.getElementById('prioritySelect').value;
@@ -37,9 +77,11 @@ function toggleTask(index) {
 }
 
 function deleteTask(index) {
-    tasks.splice(index, 1);
-    saveTasks();
-    renderTasks();
+    showConfirmDialog('Are you sure you want to delete this task?', () => {
+        tasks.splice(index, 1);
+        saveTasks();
+        renderTasks();
+    });
 }
 
 function saveTasks() {
@@ -86,12 +128,11 @@ function sortTasks(tasks, method) {
 
 function editTask(index) {
     const task = tasks[index];
-    const newText = prompt('Edit task:', task.text);
-    if (newText !== null && newText.trim() !== '') {
-        tasks[index].text = newText.trim();
+    showPromptDialog('Edit Task', task.text, (newText) => {
+        tasks[index].text = newText;
         saveTasks();
         renderTasks();
-    }
+    });
 }
 
 function searchTasks() {
@@ -166,10 +207,12 @@ function addNewFilter() {
 }
 
 function deleteCategory(index) {
-    categories.splice(index, 1);
-    saveCategories();
-    renderExistingFilters();
-    renderFilterButtons();
+    showConfirmDialog('Are you sure you want to delete this category? Tasks in this category will not be deleted.', () => {
+        categories.splice(index, 1);
+        saveCategories();
+        renderExistingFilters();
+        renderFilterButtons();
+    });
 }
 
 function updateCategoryDropdowns() {
@@ -263,3 +306,5 @@ document.getElementById('searchInput').addEventListener('input', searchTasks);
 renderTasks();
 initializeFilters();
 renderFilterButtons();
+renderFilterButtons();
+
