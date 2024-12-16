@@ -309,6 +309,50 @@ function renderTasks() {
     renderTaskList();
 }
 
+function exportTasks() {
+    const data = {
+        tasks: tasks,
+        categories: categories
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'taskara-backup.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function importTasks(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.tasks && Array.isArray(data.tasks)) {
+                    showConfirmDialog('This will replace all your current tasks and categories. Continue?', () => {
+                        tasks = data.tasks;
+                        if (data.categories && Array.isArray(data.categories)) {
+                            categories = data.categories;
+                        }
+                        saveTasks();
+                        saveCategories();
+                        renderTasks();
+                        renderFilterButtons();
+                        input.value = '';
+                    });
+                }
+            } catch (error) {
+                alert('Invalid file format');
+            }
+        };
+        reader.readAsText(file);
+    }
+}
+
 document.getElementById('taskInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         addTask();
