@@ -1,5 +1,7 @@
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
+let currentFilter = 'all';
+
 function addTask() {
     const input = document.getElementById('taskInput');
     const priority = document.getElementById('prioritySelect').value;
@@ -101,12 +103,30 @@ function updateStatistics() {
     document.getElementById('pendingTasks').textContent = pending;
 }
 
+function filterTasks(tasksToFilter) {
+    if (currentFilter === 'all') return tasksToFilter;
+    return tasksToFilter.filter(task => task.category === currentFilter);
+}
+
+function initializeFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.category;
+            renderTasks();
+        });
+    });
+}
+
 function renderTaskList(tasksToRender) {
     const taskList = document.getElementById('taskList');
     const sortMethod = document.getElementById('sortSelect').value;
     taskList.innerHTML = '';
     
-    const sortedTasks = sortTasks(tasksToRender || tasks, sortMethod);
+    const filteredTasks = filterTasks(tasksToRender || tasks);
+    const sortedTasks = sortTasks(filteredTasks, sortMethod);
     
     sortedTasks.forEach((task, index) => {
         const li = document.createElement('li');
@@ -143,3 +163,4 @@ document.getElementById('sortSelect').addEventListener('change', renderTasks);
 document.getElementById('searchInput').addEventListener('input', searchTasks);
 
 renderTasks();
+initializeFilters();

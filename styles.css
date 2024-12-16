@@ -191,3 +191,29 @@ li span.task-text {
     color: #1a73e8;
     margin-top: 5px;
 }
+
+.filter-container {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background-color: #f0f2f5;
+    color: #666;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #e4e6e9;
+}
+
+.filter-btn.active {
+    background-color: #1a73e8;
+    color: white;
+}
