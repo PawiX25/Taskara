@@ -30,6 +30,18 @@ h1 {
     margin-bottom: 20px;
 }
 
+.sort-container {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.sort-container select {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 input {
     flex: 1;
     padding: 10px;

@@ -35,11 +35,28 @@ function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
+function sortTasks(tasks, method) {
+    const priorityOrder = { high: 1, medium: 2, low: 3 };
+    const categoryOrder = { work: 1, personal: 2, shopping: 3, other: 4 };
+
+    switch (method) {
+        case 'priority':
+            return [...tasks].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        case 'category':
+            return [...tasks].sort((a, b) => categoryOrder[a.category] - categoryOrder[b.category]);
+        default:
+            return tasks;
+    }
+}
+
 function renderTasks() {
     const taskList = document.getElementById('taskList');
+    const sortMethod = document.getElementById('sortSelect').value;
     taskList.innerHTML = '';
     
-    tasks.forEach((task, index) => {
+    const sortedTasks = sortTasks(tasks, sortMethod);
+    
+    sortedTasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.className = `priority-${task.priority}`;
         if (task.completed) li.classList.add('completed');
@@ -58,5 +75,7 @@ document.getElementById('taskInput').addEventListener('keypress', function(e) {
         addTask();
     }
 });
+
+document.getElementById('sortSelect').addEventListener('change', renderTasks);
 
 renderTasks();
