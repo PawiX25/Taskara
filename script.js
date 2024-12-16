@@ -130,18 +130,32 @@ function renderTaskList(tasksToRender) {
     
     sortedTasks.forEach((task, index) => {
         const li = document.createElement('li');
-        li.className = `priority-${task.priority}`;
-        if (task.completed) li.classList.add('completed');
+        const priorityColors = {
+            high: 'border-red-500',
+            medium: 'border-yellow-500',
+            low: 'border-green-500'
+        };
         
-        const deadlineClass = isDeadlineNear(task.deadline) ? 'deadline-near' : '';
-        const deadlineText = task.deadline ? `<span class="deadline-tag ${deadlineClass}">${formatDeadline(task.deadline)}</span>` : '';
+        const categoryColors = {
+            personal: 'bg-green-100 text-green-800',
+            work: 'bg-blue-100 text-blue-800',
+            shopping: 'bg-orange-100 text-orange-800',
+            other: 'bg-purple-100 text-purple-800'
+        };
+
+        li.className = `flex items-center gap-3 p-4 bg-white rounded-lg shadow-sm border-l-4 ${priorityColors[task.priority]}`;
+        if (task.completed) li.classList.add('opacity-75');
+        
+        const deadlineClass = isDeadlineNear(task.deadline) ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+        const deadlineText = task.deadline ? 
+            `<span class="px-2 py-1 rounded-full text-xs font-medium ${deadlineClass}">${formatDeadline(task.deadline)}</span>` : '';
         
         li.innerHTML = `
-            <span class="category-tag category-${task.category}">${task.category}</span>
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${categoryColors[task.category]}">${task.category}</span>
             ${deadlineText}
-            <span class="task-text" onclick="toggleTask(${index})">${task.text}</span>
-            <button onclick="editTask(${index})">Edit</button>
-            <button onclick="deleteTask(${index})">Delete</button>
+            <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" onclick="toggleTask(${index})">${task.text}</span>
+            <button onclick="editTask(${index})" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">Edit</button>
+            <button onclick="deleteTask(${index})" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">Delete</button>
         `;
         taskList.appendChild(li);
     });
