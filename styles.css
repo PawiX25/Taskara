@@ -88,3 +88,35 @@ li.priority-low {
     text-decoration: line-through;
     color: #666;
 }
+
+.category-tag {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-right: 10px;
+}
+
+.category-personal {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.category-work {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.category-shopping {
+    background-color: #fff3e0;
+    color: #ef6c00;
+}
+
+.category-other {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+li span.task-text {
+    flex: 1;
+    margin: 0 10px;
+}
