@@ -132,3 +132,17 @@ li span.task-text {
     flex: 1;
     margin: 0 10px;
 }
+
+.deadline-tag {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-right: 10px;
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+.deadline-near {
+    background-color: #ffe0e0;
+    color: #d32f2f;
+}
