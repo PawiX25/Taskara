@@ -72,12 +72,41 @@ function sortTasks(tasks, method) {
     }
 }
 
-function renderTasks() {
+function editTask(index) {
+    const task = tasks[index];
+    const newText = prompt('Edit task:', task.text);
+    if (newText !== null && newText.trim() !== '') {
+        tasks[index].text = newText.trim();
+        saveTasks();
+        renderTasks();
+    }
+}
+
+function searchTasks() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const filteredTasks = tasks.filter(task => 
+        task.text.toLowerCase().includes(searchTerm) ||
+        task.category.toLowerCase().includes(searchTerm)
+    );
+    renderTaskList(filteredTasks);
+}
+
+function updateStatistics() {
+    const total = tasks.length;
+    const completed = tasks.filter(task => task.completed).length;
+    const pending = total - completed;
+
+    document.getElementById('totalTasks').textContent = total;
+    document.getElementById('completedTasks').textContent = completed;
+    document.getElementById('pendingTasks').textContent = pending;
+}
+
+function renderTaskList(tasksToRender) {
     const taskList = document.getElementById('taskList');
     const sortMethod = document.getElementById('sortSelect').value;
     taskList.innerHTML = '';
     
-    const sortedTasks = sortTasks(tasks, sortMethod);
+    const sortedTasks = sortTasks(tasksToRender || tasks, sortMethod);
     
     sortedTasks.forEach((task, index) => {
         const li = document.createElement('li');
@@ -91,10 +120,17 @@ function renderTasks() {
             <span class="category-tag category-${task.category}">${task.category}</span>
             ${deadlineText}
             <span class="task-text" onclick="toggleTask(${index})">${task.text}</span>
+            <button onclick="editTask(${index})">Edit</button>
             <button onclick="deleteTask(${index})">Delete</button>
         `;
         taskList.appendChild(li);
     });
+    
+    updateStatistics();
+}
+
+function renderTasks() {
+    renderTaskList();
 }
 
 document.getElementById('taskInput').addEventListener('keypress', function(e) {
@@ -104,5 +140,6 @@ document.getElementById('taskInput').addEventListener('keypress', function(e) {
 });
 
 document.getElementById('sortSelect').addEventListener('change', renderTasks);
+document.getElementById('searchInput').addEventListener('input', searchTasks);
 
 renderTasks();

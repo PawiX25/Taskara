@@ -9,6 +9,9 @@
 <body>
     <div class="container">
         <h1>Taskara</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tasks...">
+        </div>
         <div class="input-container">
             <input type="text" id="taskInput" placeholder="Enter a new task">
             <input type="date" id="deadlineInput">
@@ -34,6 +37,14 @@
             </select>
         </div>
         <ul id="taskList"></ul>
+        <div class="statistics">
+            <h3>Statistics</h3>
+            <div id="statsContainer">
+                <p>Total tasks: <span id="totalTasks">0</span></p>
+                <p>Completed tasks: <span id="completedTasks">0</span></p>
+                <p>Pending tasks: <span id="pendingTasks">0</span></p>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
