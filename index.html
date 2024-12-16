@@ -18,8 +18,12 @@
             </div>
 
             <div class="flex flex-wrap gap-4 mb-6">
-                <input type="text" id="taskInput" placeholder="Enter a new task" 
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
+                <div class="w-full flex flex-col gap-2">
+                    <input type="text" id="taskInput" placeholder="Enter a new task" 
+                        class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
+                    <textarea id="taskDescription" placeholder="Add description (optional)" 
+                        class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent h-20"></textarea>
+                </div>
                 <input type="date" id="deadlineInput" 
                     class="px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400">
                 <select id="categorySelect" 
@@ -125,7 +129,10 @@
     <div id="promptModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-6 w-96 shadow-xl">
             <h2 class="text-xl font-bold mb-4" id="promptTitle">Edit Task</h2>
-            <input type="text" id="promptInput" class="w-full px-4 py-2 rounded-lg border border-gray-200 mb-6">
+            <input type="text" id="promptInput" placeholder="Task title" 
+                class="w-full px-4 py-2 rounded-lg border border-gray-200 mb-3">
+            <textarea id="promptDescription" placeholder="Task description" 
+                class="w-full px-4 py-2 rounded-lg border border-gray-200 mb-6 h-32"></textarea>
             <div class="flex justify-end gap-2">
                 <button id="promptCancel" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                     Cancel

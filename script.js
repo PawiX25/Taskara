@@ -24,13 +24,15 @@ function showConfirmDialog(message, onConfirm) {
     };
 }
 
-function showPromptDialog(title, defaultValue, onConfirm) {
+function showPromptDialog(title, task, onConfirm) {
     const modal = document.getElementById('promptModal');
     const titleEl = document.getElementById('promptTitle');
     const input = document.getElementById('promptInput');
+    const description = document.getElementById('promptDescription');
     
     titleEl.textContent = title;
-    input.value = defaultValue;
+    input.value = task.text;
+    description.value = task.description || '';
     modal.classList.remove('hidden');
 
     document.getElementById('promptCancel').onclick = () => {
@@ -41,7 +43,7 @@ function showPromptDialog(title, defaultValue, onConfirm) {
         const value = input.value.trim();
         if (value) {
             modal.classList.add('hidden');
-            onConfirm(value);
+            onConfirm(value, description.value.trim());
         }
     };
 
@@ -50,6 +52,7 @@ function showPromptDialog(title, defaultValue, onConfirm) {
 
 function addTask() {
     const input = document.getElementById('taskInput');
+    const description = document.getElementById('taskDescription');
     const priority = document.getElementById('prioritySelect').value;
     const category = document.getElementById('categorySelect').value;
     const deadline = document.getElementById('deadlineInput').value;
@@ -57,7 +60,8 @@ function addTask() {
     
     if (task) {
         tasks.push({ 
-            text: task, 
+            text: task,
+            description: description.value.trim(), 
             completed: false,
             priority: priority,
             category: category,
@@ -66,6 +70,7 @@ function addTask() {
         saveTasks();
         renderTasks();
         input.value = '';
+        description.value = '';
         document.getElementById('deadlineInput').value = '';
     }
 }
@@ -128,8 +133,9 @@ function sortTasks(tasks, method) {
 
 function editTask(index) {
     const task = tasks[index];
-    showPromptDialog('Edit Task', task.text, (newText) => {
+    showPromptDialog('Edit Task', task, (newText, newDescription) => {
         tasks[index].text = newText;
+        tasks[index].description = newDescription;
         saveTasks();
         renderTasks();
     });
@@ -278,11 +284,20 @@ function renderTaskList(tasksToRender) {
             `<span class="px-2 py-1 rounded-full text-xs font-medium ${deadlineClass}">${formatDeadline(task.deadline)}</span>` : '';
         
         li.innerHTML = `
-            <span class="px-2 py-1 rounded-full text-xs font-medium" style="${categoryStyle}">${task.category}</span>
-            ${deadlineText}
-            <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" onclick="toggleTask(${index})">${task.text}</span>
-            <button onclick="editTask(${index})" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">Edit</button>
-            <button onclick="deleteTask(${index})" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">Delete</button>
+            <div class="w-full">
+                <div class="flex items-center gap-3">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium" style="${categoryStyle}">${task.category}</span>
+                    ${deadlineText}
+                    <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" onclick="toggleTask(${index})">${task.text}</span>
+                    <button onclick="editTask(${index})" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">Edit</button>
+                    <button onclick="deleteTask(${index})" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">Delete</button>
+                </div>
+                ${task.description ? `
+                    <div class="mt-2 text-sm text-gray-600 pl-4 border-l-2 border-gray-200">
+                        ${task.description.replace(/\n/g, '<br>')}
+                    </div>
+                ` : ''}
+            </div>
         `;
         taskList.appendChild(li);
     });
