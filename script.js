@@ -56,6 +56,7 @@ function addTask() {
     const priority = document.getElementById('prioritySelect').value;
     const category = document.getElementById('categorySelect').value;
     const deadline = document.getElementById('deadlineInput').value;
+    const duration = document.getElementById('durationInput').value;
     const task = input.value.trim();
     
     if (task) {
@@ -63,20 +64,25 @@ function addTask() {
             text: task,
             description: description.value.trim(), 
             completed: false,
+            completedDate: null,
             priority: priority,
             category: category,
-            deadline: deadline
+            deadline: deadline,
+            duration: duration,
+            createdAt: new Date().toISOString()
         });
         saveTasks();
         renderTasks();
         input.value = '';
         description.value = '';
         document.getElementById('deadlineInput').value = '';
+        document.getElementById('durationInput').value = '';
     }
 }
 
 function toggleTask(index) {
     tasks[index].completed = !tasks[index].completed;
+    tasks[index].completedDate = tasks[index].completed ? new Date().toISOString() : null;
     saveTasks();
     renderTasks();
 }
@@ -352,6 +358,55 @@ function importTasks(input) {
         reader.readAsText(file);
     }
 }
+
+function exportToCalendar() {
+    let icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Taskara//Tasks Calendar//EN'
+    ];
+
+    tasks.forEach(task => {
+        if (task.deadline) {
+            const deadline = new Date(task.deadline);
+            const duration = task.duration || 'PT1H';
+            
+            icsContent.push('BEGIN:VEVENT');
+            icsContent.push(`DTSTART:${formatDateToICS(deadline)}`);
+            icsContent.push(`DURATION:${duration}`);
+            icsContent.push(`SUMMARY:${task.text}`);
+            icsContent.push(`DESCRIPTION:${task.description || ''}`);
+            icsContent.push(`CATEGORIES:${task.category}`);
+            icsContent.push('END:VEVENT');
+        }
+    });
+
+    icsContent.push('END:VCALENDAR');
+
+    const blob = new Blob([icsContent.join('\r\n')], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'taskara-calendar.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function formatDateToICS(date) {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+        addTask();
+    } else if (e.ctrlKey && e.key === 'e') {
+        exportTasks();
+    } else if (e.ctrlKey && e.key === 'f') {
+        document.getElementById('searchInput').focus();
+    }
+});
 
 document.getElementById('taskInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
