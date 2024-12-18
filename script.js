@@ -258,7 +258,7 @@ function updateCategoryDropdowns() {
 function renderFilterButtons() {
     const container = document.getElementById('filterButtons');
     container.innerHTML = categories.map(category => `
-        <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 transition capitalize" 
+        <button class="filter-btn px-4 py-2 rounded-xl bg-white/80 hover:bg-indigo-50 transition capitalize text-sm font-medium" 
                 data-category="${category.name}">${category.name}</button>
     `).join('');
     
@@ -267,10 +267,29 @@ function renderFilterButtons() {
 
 function initializeFilters() {
     const filterButtons = document.querySelectorAll('.filter-btn');
+    const allButton = document.querySelector('[data-category="all"]');
+    
+    filterButtons.forEach(btn => {
+        btn.classList.remove('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+        btn.classList.add('bg-white/80', 'hover:bg-indigo-50');
+    });
+    
+    const activeButton = currentFilter === 'all' ? allButton : 
+        document.querySelector(`[data-category="${currentFilter}"]`);
+    
+    if (activeButton) {
+        activeButton.classList.remove('bg-white/80', 'hover:bg-indigo-50');
+        activeButton.classList.add('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+    }
+
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            filterButtons.forEach(b => b.classList.remove('active', 'bg-indigo-600', 'text-white'));
-            btn.classList.add('active', 'bg-indigo-600', 'text-white');
+            filterButtons.forEach(b => {
+                b.classList.remove('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+                b.classList.add('bg-white/80', 'hover:bg-indigo-50');
+            });
+            btn.classList.remove('bg-white/80', 'hover:bg-indigo-50');
+            btn.classList.add('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
             currentFilter = btn.dataset.category;
             renderTasks();
         });
