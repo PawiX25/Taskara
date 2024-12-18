@@ -1,4 +1,5 @@
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+tasks = tasks.map(task => ({...task, subtasks: task.subtasks || []}));
 let categories = JSON.parse(localStorage.getItem('categories')) || [
     { name: 'personal', color: 'green' },
     { name: 'work', color: 'blue' },
@@ -70,7 +71,8 @@ function addTask() {
             deadline: deadline,
             duration: duration,
             favorite: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            subtasks: []
         });
         saveTasks();
         renderTasks();
@@ -165,11 +167,14 @@ function searchTasks() {
 function updateStatistics() {
     const total = tasks.length;
     const completed = tasks.filter(task => task.completed).length;
+    const totalSubtasks = tasks.reduce((acc, task) => acc + task.subtasks.length, 0);
+    const completedSubtasks = tasks.reduce((acc, task) => 
+        acc + task.subtasks.filter(st => st.completed).length, 0);
     const pending = total - completed;
 
-    document.getElementById('totalTasks').textContent = total;
-    document.getElementById('completedTasks').textContent = completed;
-    document.getElementById('pendingTasks').textContent = pending;
+    document.getElementById('totalTasks').textContent = `${total} (${totalSubtasks} subtasks)`;
+    document.getElementById('completedTasks').textContent = `${completed} (${completedSubtasks} subtasks)`;
+    document.getElementById('pendingTasks').textContent = `${pending} (${totalSubtasks - completedSubtasks} subtasks)`;
 }
 
 function filterTasks(tasksToFilter) {
@@ -297,6 +302,36 @@ function renderTaskList(tasksToRender) {
         
         const favoriteClass = task.favorite ? 'text-yellow-500' : 'text-gray-300';
         
+        const subtasksHtml = `
+            <div class="mt-3 pl-8">
+                <div class="space-y-2">
+                    ${task.subtasks.map((subtask, subtaskIndex) => `
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" 
+                                ${subtask.completed ? 'checked' : ''} 
+                                onclick="toggleSubtask(${index}, ${subtaskIndex})"
+                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            <span class="${subtask.completed ? 'line-through text-gray-500' : ''}">${subtask.text}</span>
+                            <button onclick="deleteSubtask(${index}, ${subtaskIndex})" 
+                                class="ml-2 text-xs text-red-600 hover:text-red-800">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-2 flex items-center gap-2">
+                    <input type="text" 
+                        id="subtask-input-${index}" 
+                        placeholder="Add subtask..." 
+                        class="flex-1 px-2 py-1 text-sm border rounded">
+                    <button onclick="addSubtask(${index})" 
+                        class="px-2 py-1 text-sm bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200">
+                        Add
+                    </button>
+                </div>
+            </div>
+        `;
+
         li.innerHTML = `
             <div class="w-full">
                 <div class="flex items-center gap-3">
@@ -314,6 +349,7 @@ function renderTaskList(tasksToRender) {
                         ${task.description.replace(/\n/g, '<br>')}
                     </div>
                 ` : ''}
+                ${subtasksHtml}
             </div>
         `;
         taskList.appendChild(li);
@@ -413,6 +449,48 @@ function toggleFavorite(index) {
     tasks[index].favorite = !tasks[index].favorite;
     saveTasks();
     renderTasks();
+}
+
+function addSubtask(parentIndex) {
+    const input = document.getElementById(`subtask-input-${parentIndex}`);
+    const subtaskText = input.value.trim();
+    
+    if (subtaskText) {
+        tasks[parentIndex].subtasks.push({
+            text: subtaskText,
+            completed: false,
+            completedDate: null
+        });
+        saveTasks();
+        renderTasks();
+        input.value = '';
+    }
+}
+
+function toggleSubtask(taskIndex, subtaskIndex) {
+    const subtask = tasks[taskIndex].subtasks[subtaskIndex];
+    subtask.completed = !subtask.completed;
+    subtask.completedDate = subtask.completed ? new Date().toISOString() : null;
+    
+    const allSubtasksCompleted = tasks[taskIndex].subtasks.every(st => st.completed);
+    if (allSubtasksCompleted) {
+        tasks[taskIndex].completed = true;
+        tasks[taskIndex].completedDate = new Date().toISOString();
+    } else {
+        tasks[taskIndex].completed = false;
+        tasks[taskIndex].completedDate = null;
+    }
+    
+    saveTasks();
+    renderTasks();
+}
+
+function deleteSubtask(taskIndex, subtaskIndex) {
+    showConfirmDialog('Are you sure you want to delete this subtask?', () => {
+        tasks[taskIndex].subtasks.splice(subtaskIndex, 1);
+        saveTasks();
+        renderTasks();
+    });
 }
 
 document.addEventListener('keydown', function(e) {
