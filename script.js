@@ -287,6 +287,7 @@ function renderTaskList(tasksToRender) {
     
     sortedTasks.forEach((task, index) => {
         const li = document.createElement('li');
+        li.dataset.taskIndex = index;
         const priorityColors = {
             high: 'border-red-500',
             medium: 'border-yellow-500',
@@ -345,6 +346,9 @@ function renderTaskList(tasksToRender) {
         li.innerHTML = `
             <div class="w-full">
                 <div class="flex items-center gap-3">
+                    <button class="drag-handle cursor-move text-gray-400 hover:text-gray-600 px-1">
+                        <i class="fas fa-grip-vertical"></i>
+                    </button>
                     <button onclick="toggleFavorite(${index})" class="text-xl ${favoriteClass} hover:text-yellow-500 transition">
                         <i class="fas fa-star"></i>
                     </button>
@@ -559,6 +563,27 @@ function checkRecurringTasks() {
     renderTasks();
 }
 
+function initializeDragAndDrop() {
+    const taskList = document.getElementById('taskList');
+    new Sortable(taskList, {
+        animation: 150,
+        handle: '.drag-handle',
+        ghostClass: 'bg-gray-100',
+        onEnd: function(evt) {
+            const taskArray = Array.from(taskList.children);
+            const newTasks = [];
+            
+            taskArray.forEach(li => {
+                const taskIndex = parseInt(li.dataset.taskIndex);
+                newTasks.push(tasks[taskIndex]);
+            });
+            
+            tasks = newTasks;
+            saveTasks();
+        }
+    });
+}
+
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.key === 'Enter') {
         addTask();
@@ -578,9 +603,15 @@ document.getElementById('taskInput').addEventListener('keypress', function(e) {
 document.getElementById('sortSelect').addEventListener('change', renderTasks);
 document.getElementById('searchInput').addEventListener('input', searchTasks);
 
+document.addEventListener('DOMContentLoaded', function() {
+    renderTasks();
+    initializeFilters();
+    renderFilterButtons();
+    initializeDragAndDrop();
+});
+
 renderTasks();
 initializeFilters();
-renderFilterButtons();
 renderFilterButtons();
 
 setInterval(checkRecurringTasks, 60000);
