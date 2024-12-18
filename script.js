@@ -303,29 +303,33 @@ function renderTaskList(tasksToRender) {
         const favoriteClass = task.favorite ? 'text-yellow-500' : 'text-gray-300';
         
         const subtasksHtml = `
-            <div class="mt-3 pl-8">
+            <div class="mt-4 pl-8">
                 <div class="space-y-2">
                     ${task.subtasks.map((subtask, subtaskIndex) => `
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 p-2 bg-gray-50/50 rounded-lg hover:bg-gray-50 transition group">
                             <input type="checkbox" 
                                 ${subtask.completed ? 'checked' : ''} 
                                 onclick="toggleSubtask(${index}, ${subtaskIndex})"
-                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                            <span class="${subtask.completed ? 'line-through text-gray-500' : ''}">${subtask.text}</span>
+                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            <span class="flex-1 text-sm ${subtask.completed ? 'line-through text-gray-500' : 'text-gray-700'}">${subtask.text}</span>
                             <button onclick="deleteSubtask(${index}, ${subtaskIndex})" 
-                                class="ml-2 text-xs text-red-600 hover:text-red-800">
-                                <i class="fas fa-times"></i>
+                                class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs text-red-600 hover:text-red-800 hover:bg-red-50 rounded">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     `).join('')}
                 </div>
-                <div class="mt-2 flex items-center gap-2">
-                    <input type="text" 
-                        id="subtask-input-${index}" 
-                        placeholder="Add subtask..." 
-                        class="flex-1 px-2 py-1 text-sm border rounded">
+                <div class="mt-3 flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <input type="text" 
+                            id="subtask-input-${index}" 
+                            placeholder="Add a subtask..." 
+                            class="w-full pl-8 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white/80">
+                        <i class="fas fa-plus absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
+                    </div>
                     <button onclick="addSubtask(${index})" 
-                        class="px-2 py-1 text-sm bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200">
+                        class="px-3 py-2 text-sm bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition flex items-center gap-2">
+                        <i class="fas fa-plus text-xs"></i>
                         Add
                     </button>
                 </div>
