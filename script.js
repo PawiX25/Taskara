@@ -69,6 +69,7 @@ function addTask() {
             category: category,
             deadline: deadline,
             duration: duration,
+            favorite: false,
             createdAt: new Date().toISOString()
         });
         saveTasks();
@@ -122,6 +123,11 @@ function sortTasks(tasks, method) {
     const categoryOrder = { work: 1, personal: 2, shopping: 3, other: 4 };
 
     switch (method) {
+        case 'favorite':
+            return [...tasks].sort((a, b) => {
+                if (a.favorite === b.favorite) return 0;
+                return a.favorite ? -1 : 1;
+            });
         case 'deadline':
             return [...tasks].sort((a, b) => {
                 if (!a.deadline) return 1;
@@ -289,9 +295,14 @@ function renderTaskList(tasksToRender) {
         const deadlineText = task.deadline ? 
             `<span class="px-2 py-1 rounded-full text-xs font-medium ${deadlineClass}">${formatDeadline(task.deadline)}</span>` : '';
         
+        const favoriteClass = task.favorite ? 'text-yellow-500' : 'text-gray-300';
+        
         li.innerHTML = `
             <div class="w-full">
                 <div class="flex items-center gap-3">
+                    <button onclick="toggleFavorite(${index})" class="text-xl ${favoriteClass} hover:text-yellow-500 transition">
+                        <i class="fas fa-star"></i>
+                    </button>
                     <span class="px-2 py-1 rounded-full text-xs font-medium" style="${categoryStyle}">${task.category}</span>
                     ${deadlineText}
                     <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" onclick="toggleTask(${index})">${task.text}</span>
@@ -396,6 +407,12 @@ function exportToCalendar() {
 
 function formatDateToICS(date) {
     return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+
+function toggleFavorite(index) {
+    tasks[index].favorite = !tasks[index].favorite;
+    saveTasks();
+    renderTasks();
 }
 
 document.addEventListener('keydown', function(e) {
