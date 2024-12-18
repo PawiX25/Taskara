@@ -87,6 +87,13 @@
                             <option value="medium">Medium</option>
                             <option value="high">High</option>
                         </select>
+                        <select id="recurringSelect" 
+                            class="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-400 bg-white/80">
+                            <option value="none">No Recurrence</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
                         <input type="text" id="durationInput" placeholder="Duration (e.g., PT1H, PT30M)" 
                             class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-400 bg-white/80"
                             title="Duration in ISO 8601 format (PT1H = 1 hour, PT30M = 30 minutes)">

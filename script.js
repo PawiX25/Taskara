@@ -58,6 +58,7 @@ function addTask() {
     const category = document.getElementById('categorySelect').value;
     const deadline = document.getElementById('deadlineInput').value;
     const duration = document.getElementById('durationInput').value;
+    const recurring = document.getElementById('recurringSelect').value;
     const task = input.value.trim();
     
     if (task) {
@@ -72,7 +73,9 @@ function addTask() {
             duration: duration,
             favorite: false,
             createdAt: new Date().toISOString(),
-            subtasks: []
+            subtasks: [],
+            recurring: recurring,
+            lastRecurrence: recurring !== 'none' ? new Date().toISOString() : null
         });
         saveTasks();
         renderTasks();
@@ -336,6 +339,9 @@ function renderTaskList(tasksToRender) {
             </div>
         `;
 
+        const recurringText = task.recurring && task.recurring !== 'none' ? 
+            `<span class="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">↻ ${task.recurring}</span>` : '';
+
         li.innerHTML = `
             <div class="w-full">
                 <div class="flex items-center gap-3">
@@ -344,6 +350,7 @@ function renderTaskList(tasksToRender) {
                     </button>
                     <span class="px-2 py-1 rounded-full text-xs font-medium" style="${categoryStyle}">${task.category}</span>
                     ${deadlineText}
+                    ${recurringText}
                     <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" onclick="toggleTask(${index})">${task.text}</span>
                     <button onclick="editTask(${index})" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">Edit</button>
                     <button onclick="deleteTask(${index})" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">Delete</button>
@@ -497,6 +504,61 @@ function deleteSubtask(taskIndex, subtaskIndex) {
     });
 }
 
+function checkRecurringTasks() {
+    const today = new Date();
+    
+    tasks.forEach(task => {
+        if (!task.recurring || task.recurring === 'none') return;
+        
+        const lastRecurrence = new Date(task.lastRecurrence);
+        let shouldCreateNew = false;
+        
+        switch(task.recurring) {
+            case 'daily':
+                shouldCreateNew = today.getDate() !== lastRecurrence.getDate();
+                break;
+            case 'weekly':
+                const weekDiff = Math.floor((today - lastRecurrence) / (1000 * 60 * 60 * 24 * 7));
+                shouldCreateNew = weekDiff >= 1;
+                break;
+            case 'monthly':
+                shouldCreateNew = today.getMonth() !== lastRecurrence.getMonth();
+                break;
+        }
+        
+        if (shouldCreateNew && !task.completed) {
+            const newTask = {...task};
+            newTask.completed = false;
+            newTask.completedDate = null;
+            newTask.createdAt = new Date().toISOString();
+            newTask.lastRecurrence = new Date().toISOString();
+            newTask.subtasks = newTask.subtasks.map(st => ({...st, completed: false, completedDate: null}));
+            
+            if (task.deadline) {
+                const newDeadline = new Date(task.deadline);
+                switch(task.recurring) {
+                    case 'daily':
+                        newDeadline.setDate(newDeadline.getDate() + 1);
+                        break;
+                    case 'weekly':
+                        newDeadline.setDate(newDeadline.getDate() + 7);
+                        break;
+                    case 'monthly':
+                        newDeadline.setMonth(newDeadline.getMonth() + 1);
+                        break;
+                }
+                newTask.deadline = newDeadline.toISOString().split('T')[0];
+            }
+            
+            tasks.push(newTask);
+            task.lastRecurrence = new Date().toISOString();
+        }
+    });
+    
+    saveTasks();
+    renderTasks();
+}
+
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.key === 'Enter') {
         addTask();
@@ -520,4 +582,7 @@ renderTasks();
 initializeFilters();
 renderFilterButtons();
 renderFilterButtons();
+
+setInterval(checkRecurringTasks, 60000);
+checkRecurringTasks();
 
