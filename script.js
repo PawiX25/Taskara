@@ -668,21 +668,35 @@ function initializeDragAndDrop() {
 function showShareModal(taskIndex) {
     const modal = document.getElementById('shareModal');
     const shareLink = document.getElementById('shareLink');
+    const includeSubtasks = document.getElementById('includeSubtasks');
+    const includeNotes = document.getElementById('includeNotes');
     const task = tasks[taskIndex];
     
-    const shareData = {
-        task: {
-            text: task.text,
-            description: task.description,
-            priority: task.priority,
-            category: task.category,
-            deadline: task.deadline,
-            duration: task.duration
-        }
+    const updateShareLink = () => {
+        const shareData = {
+            task: {
+                text: task.text,
+                description: task.description,
+                priority: task.priority,
+                category: task.category,
+                deadline: task.deadline,
+                duration: task.duration,
+                subtasks: includeSubtasks.checked ? task.subtasks : [],
+                notes: includeNotes.checked ? task.notes : []
+            }
+        };
+        
+        const encodedData = btoa(JSON.stringify(shareData));
+        shareLink.value = `${BASE_URL}?share=${encodedData}`;
     };
     
-    const encodedData = btoa(JSON.stringify(shareData));
-    shareLink.value = `${BASE_URL}?share=${encodedData}`;
+    includeSubtasks.checked = false;
+    includeNotes.checked = false;
+    
+    includeSubtasks.onchange = updateShareLink;
+    includeNotes.onchange = updateShareLink;
+    
+    updateShareLink();
     modal.classList.remove('hidden');
 }
 
@@ -730,16 +744,33 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const taskData = JSON.parse(atob(sharedTask));
             showConfirmDialog('Would you like to add this shared task to your list?', () => {
-                tasks.push({
+                const newTask = {
                     ...taskData.task,
                     completed: false,
                     completedDate: null,
                     favorite: false,
                     createdAt: new Date().toISOString(),
-                    subtasks: [],
-                    notes: [],
+                    subtasks: taskData.task.subtasks || [],
+                    notes: taskData.task.notes || [],
                     recurring: 'none'
-                });
+                };
+
+                if (Array.isArray(newTask.subtasks)) {
+                    newTask.subtasks = newTask.subtasks.map(st => ({
+                        text: st.text,
+                        completed: false,
+                        completedDate: null
+                    }));
+                }
+
+                if (Array.isArray(newTask.notes)) {
+                    newTask.notes = newTask.notes.map(note => ({
+                        text: note.text,
+                        createdAt: note.createdAt || new Date().toISOString()
+                    }));
+                }
+
+                tasks.push(newTask);
                 saveTasks();
                 renderTasks();
                 window.history.replaceState({}, document.title, window.location.pathname);
