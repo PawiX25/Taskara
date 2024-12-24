@@ -142,10 +142,10 @@
             <div class="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
                 <span class="text-gray-600 dark:text-gray-300 font-medium">Filter:</span>
                 <div class="flex flex-wrap gap-2">
-                    <button class="filter-btn px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition capitalize text-sm font-medium" data-category="all">All</button>
+                    <button class="filter-btn px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition capitalize text-sm font-medium" data-category="all">All</button>
                     <div id="filterButtons" class="flex flex-wrap gap-2"></div>
                     <button onclick="openFilterModal()" 
-                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-gray-600 transition">
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition">
                         <i class="fas fa-tags text-sm"></i>
                         <span>Manage Categories</span>
                     </button>
@@ -184,7 +184,7 @@
             <div class="space-y-4 mb-4" id="existingFilters"></div>
             <div class="flex gap-2 mb-4">
                 <input type="text" id="newFilterName" placeholder="New category name" 
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                    class="flex-1 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:text-white">
                 <input type="color" id="newFilterColor" value="#6366f1" 
                     class="w-12 h-10 rounded border border-gray-200 dark:border-gray-700 cursor-pointer">
             </div>
@@ -219,9 +219,9 @@
         <div class="bg-white/90 dark:bg-gray-800/90 dark:text-white dark:border-gray-700 backdrop-blur-sm rounded-xl p-6 w-96 shadow-2xl border border-indigo-100 max-h-[90vh] overflow-y-auto">
             <h2 class="text-xl font-bold mb-4" id="promptTitle">Edit Task</h2>
             <input type="text" id="promptInput" placeholder="Task title" 
-                class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 mb-3">
+                class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:text-white mb-3">
             <textarea id="promptDescription" placeholder="Task description" 
-                class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 mb-6 h-32"></textarea>
+                class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:text-white mb-6 h-32"></textarea>
             <div class="flex justify-end gap-2">
                 <button id="promptCancel" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
                     Cancel

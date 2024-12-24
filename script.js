@@ -199,15 +199,16 @@ function closeFilterModal() {
 function renderExistingFilters() {
     const container = document.getElementById('existingFilters');
     container.innerHTML = categories.map((category, index) => `
-        <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+        <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
             <div class="flex items-center gap-2">
                 <span class="capitalize px-2 py-1 rounded-full text-xs font-medium" 
                     style="background-color: ${category.color}25; color: ${category.color}">${category.name}</span>
                 <input type="color" value="${category.color}" 
                     onchange="updateCategoryColor(${index}, this.value)" 
-                    class="w-6 h-6 cursor-pointer">
+                    class="w-6 h-6 rounded border-gray-300 dark:border-gray-600 cursor-pointer">
             </div>
-            <button onclick="deleteCategory(${index})" class="text-red-600 hover:text-red-800">Delete</button>
+            <button onclick="deleteCategory(${index})" 
+                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
         </div>
     `).join('');
     
@@ -260,7 +261,7 @@ function updateCategoryDropdowns() {
 function renderFilterButtons() {
     const container = document.getElementById('filterButtons');
     container.innerHTML = categories.map(category => `
-        <button class="filter-btn px-4 py-2 rounded-xl bg-white/80 hover:bg-indigo-50 transition capitalize text-sm font-medium" 
+        <button class="filter-btn px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition capitalize text-sm font-medium" 
                 data-category="${category.name}">${category.name}</button>
     `).join('');
     
@@ -272,26 +273,26 @@ function initializeFilters() {
     const allButton = document.querySelector('[data-category="all"]');
     
     filterButtons.forEach(btn => {
-        btn.classList.remove('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
-        btn.classList.add('bg-white/80', 'hover:bg-indigo-50');
+        btn.classList.remove('active', 'bg-indigo-600', 'text-white');
+        btn.classList.add('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
     });
     
     const activeButton = currentFilter === 'all' ? allButton : 
         document.querySelector(`[data-category="${currentFilter}"]`);
     
     if (activeButton) {
-        activeButton.classList.remove('bg-white/80', 'hover:bg-indigo-50');
-        activeButton.classList.add('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+        activeButton.classList.remove('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
+        activeButton.classList.add('active', 'bg-indigo-600', 'text-white');
     }
 
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             filterButtons.forEach(b => {
-                b.classList.remove('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
-                b.classList.add('bg-white/80', 'hover:bg-indigo-50');
+                b.classList.remove('active', 'bg-indigo-600', 'text-white');
+                b.classList.add('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
             });
-            btn.classList.remove('bg-white/80', 'hover:bg-indigo-50');
-            btn.classList.add('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+            btn.classList.remove('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
+            btn.classList.add('active', 'bg-indigo-600', 'text-white');
             currentFilter = btn.dataset.category;
             renderTasks();
         });
