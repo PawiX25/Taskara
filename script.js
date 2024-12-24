@@ -8,6 +8,7 @@ let categories = JSON.parse(localStorage.getItem('categories')) || [
 ];
 
 let currentFilter = 'all';
+const BASE_URL = window.location.origin + window.location.pathname;
 
 function showConfirmDialog(message, onConfirm) {
     const modal = document.getElementById('confirmModal');
@@ -409,6 +410,9 @@ function renderTaskList(tasksToRender) {
                     ${deadlineText}
                     ${recurringText}
                     <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" onclick="toggleTask(${index})">${task.text}</span>
+                    <button onclick="showShareModal(${index})" class="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
                     <button onclick="editTask(${index})" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">Edit</button>
                     <button onclick="deleteTask(${index})" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">Delete</button>
                 </div>
@@ -661,6 +665,44 @@ function initializeDragAndDrop() {
     });
 }
 
+function showShareModal(taskIndex) {
+    const modal = document.getElementById('shareModal');
+    const shareLink = document.getElementById('shareLink');
+    const task = tasks[taskIndex];
+    
+    const shareData = {
+        task: {
+            text: task.text,
+            description: task.description,
+            priority: task.priority,
+            category: task.category,
+            deadline: task.deadline,
+            duration: task.duration
+        }
+    };
+    
+    const encodedData = btoa(JSON.stringify(shareData));
+    shareLink.value = `${BASE_URL}?share=${encodedData}`;
+    modal.classList.remove('hidden');
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').classList.add('hidden');
+}
+
+function copyShareLink() {
+    const shareLink = document.getElementById('shareLink');
+    shareLink.select();
+    document.execCommand('copy');
+    
+    const copyButton = shareLink.nextElementSibling;
+    const originalText = copyButton.textContent;
+    copyButton.textContent = 'Copied!';
+    setTimeout(() => {
+        copyButton.textContent = originalText;
+    }, 2000);
+}
+
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.key === 'Enter') {
         addTask();
@@ -681,6 +723,32 @@ document.getElementById('sortSelect').addEventListener('change', renderTasks);
 document.getElementById('searchInput').addEventListener('input', searchTasks);
 
 document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedTask = urlParams.get('share');
+    
+    if (sharedTask) {
+        try {
+            const taskData = JSON.parse(atob(sharedTask));
+            showConfirmDialog('Would you like to add this shared task to your list?', () => {
+                tasks.push({
+                    ...taskData.task,
+                    completed: false,
+                    completedDate: null,
+                    favorite: false,
+                    createdAt: new Date().toISOString(),
+                    subtasks: [],
+                    notes: [],
+                    recurring: 'none'
+                });
+                saveTasks();
+                renderTasks();
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        } catch (error) {
+            console.error('Invalid share link');
+        }
+    }
+    
     renderTasks();
     initializeFilters();
     renderFilterButtons();
