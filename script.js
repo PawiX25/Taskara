@@ -409,7 +409,9 @@ function renderTaskList(tasksToRender) {
                     <span class="px-2 py-1 rounded-full text-xs font-medium" style="${categoryStyle}">${task.category}</span>
                     ${deadlineText}
                     ${recurringText}
-                    <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" onclick="toggleTask(${index})">${task.text}</span>
+                    <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''} hover:bg-gray-100 p-2 rounded transition-colors" 
+                        onclick="toggleTask(${index})" 
+                        title="Click to mark as ${task.completed ? 'incomplete' : 'complete'}">${task.text}</span>
                     <button onclick="showShareModal(${index})" class="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition">
                         <i class="fas fa-share-alt"></i>
                     </button>
@@ -724,6 +726,14 @@ function copyShareLink() {
     setTimeout(() => {
         copyButton.textContent = originalText;
     }, 2000);
+}
+
+function showHelpModal() {
+    document.getElementById('helpModal').classList.remove('hidden');
+}
+
+function closeHelpModal() {
+    document.getElementById('helpModal').classList.add('hidden');
 }
 
 document.addEventListener('keydown', function(e) {

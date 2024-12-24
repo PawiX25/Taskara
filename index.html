@@ -29,6 +29,11 @@
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Taskara</h1>
                 <div class="flex items-center gap-3">
+                    <button onclick="showHelpModal()" 
+                        class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition flex items-center gap-2">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help</span>
+                    </button>
                     <button onclick="exportTasks()" 
                         class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition flex items-center gap-2">
                         <i class="fas fa-download"></i>
@@ -246,6 +251,48 @@
             <li><kbd class="px-2 py-1 bg-gray-100 rounded">Ctrl</kbd> + <kbd class="px-2 py-1 bg-gray-100 rounded">E</kbd> Export Tasks</li>
             <li><kbd class="px-2 py-1 bg-gray-100 rounded">Ctrl</kbd> + <kbd class="px-2 py-1 bg-gray-100 rounded">F</kbd> Search</li>
         </ul>
+    </div>
+    <div id="helpModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 w-[600px] shadow-2xl border border-indigo-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-indigo-600">How to Use Taskara</h2>
+                <button onclick="closeHelpModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4 text-gray-600">
+                <section>
+                    <h3 class="font-bold text-lg text-gray-800 mb-2">Task Management</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><b>Create a task:</b> Fill in the task details and click the + button or press Ctrl+Enter</li>
+                        <li><b>Mark as complete:</b> Click on the task text to toggle completion</li>
+                        <li><b>Edit task:</b> Click the "Edit" button on any task</li>
+                        <li><b>Delete task:</b> Click the "Delete" button on any task</li>
+                        <li><b>Favorite task:</b> Click the star icon to mark as favorite</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3 class="font-bold text-lg text-gray-800 mb-2">Organization</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><b>Categories:</b> Use "Manage Categories" to create and customize task categories</li>
+                        <li><b>Filter:</b> Use category buttons to filter tasks</li>
+                        <li><b>Sort:</b> Use the sort dropdown to organize tasks</li>
+                        <li><b>Search:</b> Use the search bar to find specific tasks (Ctrl+F)</li>
+                        <li><b>Drag & Drop:</b> Use the grip handle to reorder tasks</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3 class="font-bold text-lg text-gray-800 mb-2">Additional Features</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><b>Subtasks:</b> Add smaller tasks within main tasks</li>
+                        <li><b>Notes:</b> Add notes to tasks for additional information</li>
+                        <li><b>Recurring Tasks:</b> Set tasks to repeat daily, weekly, or monthly</li>
+                        <li><b>Share Tasks:</b> Use the share button to generate shareable links</li>
+                        <li><b>Export/Import:</b> Backup and restore your tasks</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
