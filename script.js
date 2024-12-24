@@ -1,5 +1,5 @@
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-tasks = tasks.map(task => ({...task, subtasks: task.subtasks || []}));
+tasks = tasks.map(task => ({...task, subtasks: task.subtasks || [], notes: task.notes || []}));
 let categories = JSON.parse(localStorage.getItem('categories')) || [
     { name: 'personal', color: 'green' },
     { name: 'work', color: 'blue' },
@@ -74,6 +74,7 @@ function addTask() {
             favorite: false,
             createdAt: new Date().toISOString(),
             subtasks: [],
+            notes: [],
             recurring: recurring,
             lastRecurrence: recurring !== 'none' ? new Date().toISOString() : null
         });
@@ -359,6 +360,39 @@ function renderTaskList(tasksToRender) {
             </div>
         `;
 
+        const notesHtml = `
+            <div class="mt-4 pl-8">
+                <div class="space-y-2">
+                    ${task.notes.map((note, noteIndex) => `
+                        <div class="flex items-center gap-2 p-2 bg-yellow-50/50 rounded-lg hover:bg-yellow-50 transition group">
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-700">${note.text}</p>
+                                <p class="text-xs text-gray-500">${new Date(note.createdAt).toLocaleString()}</p>
+                            </div>
+                            <button onclick="deleteNote(${index}, ${noteIndex})" 
+                                class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs text-red-600 hover:text-red-800 hover:bg-red-50 rounded">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <input type="text" 
+                            id="note-input-${index}" 
+                            placeholder="Add a note..." 
+                            class="w-full pl-8 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent bg-white/80">
+                        <i class="fas fa-sticky-note absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
+                    </div>
+                    <button onclick="addNote(${index})" 
+                        class="px-3 py-2 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition flex items-center gap-2">
+                        <i class="fas fa-plus text-xs"></i>
+                        Add Note
+                    </button>
+                </div>
+            </div>
+        `;
+
         const recurringText = task.recurring && task.recurring !== 'none' ? 
             `<span class="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">↻ ${task.recurring}</span>` : '';
 
@@ -384,6 +418,7 @@ function renderTaskList(tasksToRender) {
                     </div>
                 ` : ''}
                 ${subtasksHtml}
+                ${notesHtml}
             </div>
         `;
         taskList.appendChild(li);
@@ -522,6 +557,29 @@ function toggleSubtask(taskIndex, subtaskIndex) {
 function deleteSubtask(taskIndex, subtaskIndex) {
     showConfirmDialog('Are you sure you want to delete this subtask?', () => {
         tasks[taskIndex].subtasks.splice(subtaskIndex, 1);
+        saveTasks();
+        renderTasks();
+    });
+}
+
+function addNote(taskIndex) {
+    const input = document.getElementById(`note-input-${taskIndex}`);
+    const noteText = input.value.trim();
+    
+    if (noteText) {
+        tasks[taskIndex].notes.push({
+            text: noteText,
+            createdAt: new Date().toISOString()
+        });
+        saveTasks();
+        renderTasks();
+        input.value = '';
+    }
+}
+
+function deleteNote(taskIndex, noteIndex) {
+    showConfirmDialog('Are you sure you want to delete this note?', () => {
+        tasks[taskIndex].notes.splice(noteIndex, 1);
         saveTasks();
         renderTasks();
     });
