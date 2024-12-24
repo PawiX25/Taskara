@@ -818,23 +818,28 @@ function toggleDarkMode() {
     const html = document.documentElement;
     const isDark = html.classList.toggle('dark');
     localStorage.setItem('darkMode', isDark);
-    updateDarkModeButton();
-}
-
-function updateDarkModeButton() {
-    const button = document.getElementById('darkModeButton');
-    const isDark = document.documentElement.classList.contains('dark');
-    button.innerHTML = isDark ? 
-        '<i class="fas fa-sun"></i>' : 
-        '<i class="fas fa-moon"></i>';
+    
+    document.body.style.transition = 'background-color 0.3s ease';
+    
 }
 
 function initializeDarkMode() {
-    const prefersDark = localStorage.getItem('darkMode') !== 'false';
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const storedPreference = localStorage.getItem('darkMode');
     
-    if (prefersDark) {
+    if (storedPreference !== null) {
+        document.documentElement.classList.toggle('dark', storedPreference === 'true');
+    } else if (prefersDark) {
         document.documentElement.classList.add('dark');
+        localStorage.setItem('darkMode', 'true');
     }
-    updateDarkModeButton();
+    
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (localStorage.getItem('darkMode') === null) {
+            document.documentElement.classList.toggle('dark', e.matches);
+        }
+    });
 }
+
+initializeDarkMode();
 
