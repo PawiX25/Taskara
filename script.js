@@ -670,6 +670,7 @@ function showShareModal(taskIndex) {
     const shareLink = document.getElementById('shareLink');
     const includeSubtasks = document.getElementById('includeSubtasks');
     const includeNotes = document.getElementById('includeNotes');
+    const includeStatus = document.getElementById('includeStatus');
     const task = tasks[taskIndex];
     
     const updateShareLink = () => {
@@ -681,7 +682,13 @@ function showShareModal(taskIndex) {
                 category: task.category,
                 deadline: task.deadline,
                 duration: task.duration,
-                subtasks: includeSubtasks.checked ? task.subtasks : [],
+                completed: includeStatus.checked ? task.completed : false,
+                completedDate: includeStatus.checked ? task.completedDate : null,
+                subtasks: includeSubtasks.checked ? task.subtasks.map(st => ({
+                    ...st,
+                    completed: includeStatus.checked ? st.completed : false,
+                    completedDate: includeStatus.checked ? st.completedDate : null
+                })) : [],
                 notes: includeNotes.checked ? task.notes : []
             }
         };
@@ -690,9 +697,11 @@ function showShareModal(taskIndex) {
         shareLink.value = `${BASE_URL}?share=${encodedData}`;
     };
     
+    includeStatus.checked = false;
     includeSubtasks.checked = false;
     includeNotes.checked = false;
     
+    includeStatus.onchange = updateShareLink;
     includeSubtasks.onchange = updateShareLink;
     includeNotes.onchange = updateShareLink;
     
@@ -746,8 +755,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showConfirmDialog('Would you like to add this shared task to your list?', () => {
                 const newTask = {
                     ...taskData.task,
-                    completed: false,
-                    completedDate: null,
+                    completed: taskData.task.completed || false,
+                    completedDate: taskData.task.completedDate || null,
                     favorite: false,
                     createdAt: new Date().toISOString(),
                     subtasks: taskData.task.subtasks || [],
@@ -758,8 +767,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (Array.isArray(newTask.subtasks)) {
                     newTask.subtasks = newTask.subtasks.map(st => ({
                         text: st.text,
-                        completed: false,
-                        completedDate: null
+                        completed: st.completed || false,
+                        completedDate: st.completedDate || null
                     }));
                 }
 
