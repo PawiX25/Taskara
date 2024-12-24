@@ -4,17 +4,61 @@ Taskara is a sleek and intuitive to-do list application designed to help you man
 
 ## Features
 
-- **Add Tasks**: Quickly add new tasks with descriptions, set priorities, assign categories, and set deadlines.
-- **Edit Tasks**: Modify existing tasks' titles and descriptions.
-- **Delete Tasks**: Remove tasks that are no longer needed.
-- **Mark as Completed**: Toggle tasks between completed and pending states.
-- **Categories**: Create and manage custom categories with customizable colors.
-- **Priorities**: Assign priority levels (High, Medium, Low) to organize tasks.
-- **Deadlines**: Set deadlines and receive visual alerts when deadlines are near.
-- **Search Functionality**: Search tasks by title or category.
-- **Sorting**: Sort tasks by deadline, priority, or category.
-- **Statistics**: View total tasks, completed tasks, and pending tasks.
-- **Import/Export**: Backup your tasks and categories or import them from a backup file.
+- **Task Management**
+  - Add, edit, and delete tasks
+  - Mark tasks as complete/incomplete
+  - Add descriptions to tasks
+  - Mark tasks as favorites
+  - Set priorities (High, Medium, Low)
+  - Set deadlines with visual alerts
+  - Add duration estimates
+  - Drag and drop to reorder tasks
+
+- **Organization**
+  - Create custom categories with colors
+  - Filter tasks by category
+  - Sort by favorites, deadline, priority, or category
+  - Search tasks by title or category
+  - View task statistics
+
+- **Subtasks**
+  - Add subtasks to break down complex tasks
+  - Mark subtasks as complete/incomplete
+  - Delete subtasks individually
+
+- **Notes**
+  - Add multiple notes to any task
+  - View note creation timestamps
+  - Delete notes individually
+
+- **Recurring Tasks**
+  - Set tasks to repeat daily, weekly, or monthly
+  - Automatic creation of recurring task instances
+  - Track last recurrence date
+
+- **Sharing**
+  - Generate shareable links for tasks
+  - Choose what to include in shared tasks:
+    - Completion status
+    - Subtasks
+    - Notes
+
+- **Export Options**
+  - Export tasks and categories as JSON
+  - Export tasks to calendar (ICS format)
+  - Import tasks from backup files
+
+- **Appearance**
+  - Dark/Light mode toggle
+  - Responsive design for mobile devices
+  - Backdrop blur effects
+  - Smooth animations
+
+- **Keyboard Shortcuts**
+  - Ctrl + Enter: Add task
+  - Ctrl + E: Export tasks
+  - Ctrl + F: Focus search
+  - Esc: Close modals
 
 ## Getting Started
 
@@ -86,6 +130,36 @@ Taskara is a sleek and intuitive to-do list application designed to help you man
 - **Importing Tasks**
 
   - Click the **Import** button and select a backup file to restore tasks and categories.
+
+- **Managing Subtasks**
+  - Add subtasks using the subtask input field below each task
+  - Click the checkbox to mark subtasks complete
+  - Click the delete button to remove subtasks
+
+- **Managing Notes**
+  - Add notes using the note input field below each task
+  - Notes show creation timestamps
+  - Click the delete button to remove notes
+
+- **Recurring Tasks**
+  - Select recurrence interval when creating a task (Daily/Weekly/Monthly)
+  - Tasks automatically recreate based on their interval
+  - Original task remains until marked complete
+
+- **Sharing Tasks**
+  - Click the share button on any task
+  - Choose what to include in the shared task
+  - Copy the generated link
+  - Recipients can import shared tasks
+
+- **Calendar Export**
+  - Click "Export to Calendar" to generate an ICS file
+  - Import the file into your preferred calendar app
+  - Tasks with deadlines appear as calendar events
+
+- **Theme Toggle**
+  - Click the theme button to switch between light and dark mode
+  - Theme preference is saved locally
 
 ## Built With
 
