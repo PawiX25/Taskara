@@ -318,10 +318,10 @@ function renderTaskList(tasksToRender) {
         const taskCategory = categories.find(c => c.name === task.category) || { name: task.category, color: '#666666' };
         const categoryStyle = `background-color: ${taskCategory.color}25; color: ${taskCategory.color}`;
         
-        li.className = `flex items-center gap-3 p-4 bg-white rounded-lg shadow-sm border-l-4 ${priorityColors[task.priority]}`;
+        li.className = `flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 ${priorityColors[task.priority]}`;
         if (task.completed) li.classList.add('opacity-75');
         
-        const deadlineClass = isDeadlineNear(task.deadline) ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+        const deadlineClass = isDeadlineNear(task.deadline) ? 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
         const deadlineText = task.deadline ? 
             `<span class="px-2 py-1 rounded-full text-xs font-medium ${deadlineClass}">${formatDeadline(task.deadline)}</span>` : '';
         
@@ -331,14 +331,14 @@ function renderTaskList(tasksToRender) {
             <div class="mt-4 pl-8">
                 <div class="space-y-2">
                     ${task.subtasks.map((subtask, subtaskIndex) => `
-                        <div class="flex items-center gap-2 p-2 bg-gray-50/50 rounded-lg hover:bg-gray-50 transition group">
+                        <div class="flex items-center gap-2 p-2 bg-gray-50/50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition group">
                             <input type="checkbox" 
                                 ${subtask.completed ? 'checked' : ''} 
                                 onclick="toggleSubtask(${index}, ${subtaskIndex})"
-                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                            <span class="flex-1 text-sm ${subtask.completed ? 'line-through text-gray-500' : 'text-gray-700'}">${subtask.text}</span>
+                                class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                            <span class="flex-1 text-sm ${subtask.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-700 dark:text-gray-200'}">${subtask.text}</span>
                             <button onclick="deleteSubtask(${index}, ${subtaskIndex})" 
-                                class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs text-red-600 hover:text-red-800 hover:bg-red-50 rounded">
+                                class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50 rounded">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -349,11 +349,11 @@ function renderTaskList(tasksToRender) {
                         <input type="text" 
                             id="subtask-input-${index}" 
                             placeholder="Add a subtask..." 
-                            class="w-full pl-8 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white/80">
-                        <i class="fas fa-plus absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
+                            class="w-full pl-8 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white/80 dark:bg-gray-700/80 dark:text-white">
+                        <i class="fas fa-plus absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xs"></i>
                     </div>
                     <button onclick="addSubtask(${index})" 
-                        class="px-3 py-2 text-sm bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition flex items-center gap-2">
+                        class="px-3 py-2 text-sm bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900 transition flex items-center gap-2">
                         <i class="fas fa-plus text-xs"></i>
                         Add
                     </button>
@@ -365,13 +365,13 @@ function renderTaskList(tasksToRender) {
             <div class="mt-4 pl-8">
                 <div class="space-y-2">
                     ${task.notes.map((note, noteIndex) => `
-                        <div class="flex items-center gap-2 p-2 bg-yellow-50/50 rounded-lg hover:bg-yellow-50 transition group">
+                        <div class="flex items-center gap-2 p-2 bg-yellow-50/50 dark:bg-yellow-900/20 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition group">
                             <div class="flex-1">
-                                <p class="text-sm text-gray-700">${note.text}</p>
-                                <p class="text-xs text-gray-500">${new Date(note.createdAt).toLocaleString()}</p>
+                                <p class="text-sm text-gray-700 dark:text-gray-200">${note.text}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">${new Date(note.createdAt).toLocaleString()}</p>
                             </div>
                             <button onclick="deleteNote(${index}, ${noteIndex})" 
-                                class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs text-red-600 hover:text-red-800 hover:bg-red-50 rounded">
+                                class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50 rounded">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -382,11 +382,11 @@ function renderTaskList(tasksToRender) {
                         <input type="text" 
                             id="note-input-${index}" 
                             placeholder="Add a note..." 
-                            class="w-full pl-8 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent bg-white/80">
-                        <i class="fas fa-sticky-note absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
+                            class="w-full pl-8 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent bg-white/80 dark:bg-gray-700/80 dark:text-white">
+                        <i class="fas fa-sticky-note absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xs"></i>
                     </div>
                     <button onclick="addNote(${index})" 
-                        class="px-3 py-2 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition flex items-center gap-2">
+                        class="px-3 py-2 text-sm bg-yellow-50 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900 transition flex items-center gap-2">
                         <i class="fas fa-plus text-xs"></i>
                         Add Note
                     </button>
@@ -395,12 +395,18 @@ function renderTaskList(tasksToRender) {
         `;
 
         const recurringText = task.recurring && task.recurring !== 'none' ? 
-            `<span class="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">↻ ${task.recurring}</span>` : '';
+            `<span class="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300">↻ ${task.recurring}</span>` : '';
+
+        const descriptionHtml = task.description ? `
+            <div class="mt-2 text-sm text-gray-600 dark:text-gray-300 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                ${task.description.replace(/\n/g, '<br>')}
+            </div>
+        ` : '';
 
         li.innerHTML = `
             <div class="w-full">
                 <div class="flex items-center gap-3">
-                    <button class="drag-handle cursor-move text-gray-400 hover:text-gray-600 px-1">
+                    <button class="drag-handle cursor-move text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 px-1">
                         <i class="fas fa-grip-vertical"></i>
                     </button>
                     <button onclick="toggleFavorite(${index})" class="text-xl ${favoriteClass} hover:text-yellow-500 transition">
@@ -409,20 +415,16 @@ function renderTaskList(tasksToRender) {
                     <span class="px-2 py-1 rounded-full text-xs font-medium" style="${categoryStyle}">${task.category}</span>
                     ${deadlineText}
                     ${recurringText}
-                    <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''} hover:bg-gray-100 p-2 rounded transition-colors" 
+                    <span class="flex-1 cursor-pointer ${task.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'dark:text-white'} hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded transition-colors" 
                         onclick="toggleTask(${index})" 
                         title="Click to mark as ${task.completed ? 'incomplete' : 'complete'}">${task.text}</span>
-                    <button onclick="showShareModal(${index})" class="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition">
+                    <button onclick="showShareModal(${index})" class="px-3 py-1 text-sm bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded hover:bg-indigo-200 dark:hover:bg-indigo-900 transition">
                         <i class="fas fa-share-alt"></i>
                     </button>
-                    <button onclick="editTask(${index})" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">Edit</button>
-                    <button onclick="deleteTask(${index})" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">Delete</button>
+                    <button onclick="editTask(${index})" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition">Edit</button>
+                    <button onclick="deleteTask(${index})" class="px-3 py-1 text-sm bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-900 transition">Delete</button>
                 </div>
-                ${task.description ? `
-                    <div class="mt-2 text-sm text-gray-600 pl-4 border-l-2 border-gray-200">
-                        ${task.description.replace(/\n/g, '<br>')}
-                    </div>
-                ` : ''}
+                ${descriptionHtml}
                 ${subtasksHtml}
                 ${notesHtml}
             </div>
@@ -811,4 +813,28 @@ renderFilterButtons();
 
 setInterval(checkRecurringTasks, 60000);
 checkRecurringTasks();
+
+function toggleDarkMode() {
+    const html = document.documentElement;
+    const isDark = html.classList.toggle('dark');
+    localStorage.setItem('darkMode', isDark);
+    updateDarkModeButton();
+}
+
+function updateDarkModeButton() {
+    const button = document.getElementById('darkModeButton');
+    const isDark = document.documentElement.classList.contains('dark');
+    button.innerHTML = isDark ? 
+        '<i class="fas fa-sun"></i>' : 
+        '<i class="fas fa-moon"></i>';
+}
+
+function initializeDarkMode() {
+    const prefersDark = localStorage.getItem('darkMode') !== 'false';
+    
+    if (prefersDark) {
+        document.documentElement.classList.add('dark');
+    }
+    updateDarkModeButton();
+}
 
