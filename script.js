@@ -52,6 +52,23 @@ function showPromptDialog(title, task, onConfirm) {
     input.focus();
 }
 
+function showAddTaskModal() {
+    const modal = document.getElementById('addTaskModal');
+    modal.classList.remove('hidden');
+    document.getElementById('taskInput').focus();
+}
+
+function closeAddTaskModal() {
+    const modal = document.getElementById('addTaskModal');
+    modal.classList.add('hidden');
+    document.getElementById('taskInput').value = '';
+    document.getElementById('taskDescription').value = '';
+    document.getElementById('deadlineInput').value = '';
+    document.getElementById('durationInput').value = '';
+    document.getElementById('prioritySelect').value = 'low';
+    document.getElementById('recurringSelect').value = 'none';
+}
+
 function addTask() {
     const input = document.getElementById('taskInput');
     const description = document.getElementById('taskDescription');
@@ -85,6 +102,7 @@ function addTask() {
         description.value = '';
         document.getElementById('deadlineInput').value = '';
         document.getElementById('durationInput').value = '';
+        closeAddTaskModal();
     }
 }
 
@@ -199,16 +217,17 @@ function closeFilterModal() {
 function renderExistingFilters() {
     const container = document.getElementById('existingFilters');
     container.innerHTML = categories.map((category, index) => `
-        <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
+        <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
             <div class="flex items-center gap-2">
-                <span class="capitalize px-2 py-1 rounded-full text-xs font-medium" 
+                <span class="capitalize px-2 py-1 rounded-full text-xs font-medium dark:bg-opacity-20" 
                     style="background-color: ${category.color}25; color: ${category.color}">${category.name}</span>
                 <input type="color" value="${category.color}" 
                     onchange="updateCategoryColor(${index}, this.value)" 
-                    class="w-6 h-6 rounded border-gray-300 dark:border-gray-600 cursor-pointer">
+                    class="w-6 h-6 cursor-pointer bg-transparent border-0">
             </div>
-            <button onclick="deleteCategory(${index})" 
-                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+            <button onclick="deleteCategory(${index})" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     `).join('');
     
@@ -260,10 +279,20 @@ function updateCategoryDropdowns() {
 
 function renderFilterButtons() {
     const container = document.getElementById('filterButtons');
-    container.innerHTML = categories.map(category => `
-        <button class="filter-btn px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition capitalize text-sm font-medium" 
-                data-category="${category.name}">${category.name}</button>
-    `).join('');
+    container.innerHTML = `
+        <button class="filter-btn w-full text-left px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition capitalize text-sm font-medium" 
+                data-category="all">
+            <i class="fas fa-tasks mr-2"></i>
+            All Tasks
+        </button>
+        ${categories.map(category => `
+            <button class="filter-btn w-full text-left px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-700/80 hover:bg-indigo-50 dark:hover:bg-gray-600 transition capitalize text-sm font-medium dark:text-gray-200" 
+                    data-category="${category.name}">
+                <i class="fas fa-tag mr-2" style="color: ${category.color}"></i>
+                ${category.name}
+            </button>
+        `).join('')}
+    `;
     
     initializeFilters();
 }
@@ -273,26 +302,26 @@ function initializeFilters() {
     const allButton = document.querySelector('[data-category="all"]');
     
     filterButtons.forEach(btn => {
-        btn.classList.remove('active', 'bg-indigo-600', 'text-white');
-        btn.classList.add('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
+        btn.classList.remove('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+        btn.classList.add('bg-white/80', 'dark:bg-gray-700/80', 'hover:bg-indigo-50', 'dark:hover:bg-gray-600', 'dark:text-gray-200');
     });
     
     const activeButton = currentFilter === 'all' ? allButton : 
         document.querySelector(`[data-category="${currentFilter}"]`);
     
     if (activeButton) {
-        activeButton.classList.remove('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
-        activeButton.classList.add('active', 'bg-indigo-600', 'text-white');
+        activeButton.classList.remove('bg-white/80', 'dark:bg-gray-700/80', 'hover:bg-indigo-50', 'dark:hover:bg-gray-600', 'dark:text-gray-200');
+        activeButton.classList.add('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
     }
 
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             filterButtons.forEach(b => {
-                b.classList.remove('active', 'bg-indigo-600', 'text-white');
-                b.classList.add('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
+                b.classList.remove('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+                b.classList.add('bg-white/80', 'hover:bg-indigo-50');
             });
-            btn.classList.remove('bg-white/80', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-indigo-50', 'dark:hover:bg-gray-700');
-            btn.classList.add('active', 'bg-indigo-600', 'text-white');
+            btn.classList.remove('bg-white/80', 'hover:bg-indigo-50');
+            btn.classList.add('active', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
             currentFilter = btn.dataset.category;
             renderTasks();
         });
@@ -739,6 +768,11 @@ function closeHelpModal() {
     document.getElementById('helpModal').classList.add('hidden');
 }
 
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('shown');
+}
+
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.key === 'Enter') {
         addTask();
@@ -746,6 +780,14 @@ document.addEventListener('keydown', function(e) {
         exportTasks();
     } else if (e.ctrlKey && e.key === 'f') {
         document.getElementById('searchInput').focus();
+    }
+    if (e.key === 'Escape') {
+        closeAddTaskModal();
+        closeFilterModal();
+        closeShareModal();
+        closeHelpModal();
+        document.getElementById('confirmModal').classList.add('hidden');
+        document.getElementById('promptModal').classList.add('hidden');
     }
 });
 
@@ -806,6 +848,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFilters();
     renderFilterButtons();
     initializeDragAndDrop();
+    
+    if (window.innerWidth < 1024) {
+        const menuButton = document.createElement('button');
+        menuButton.className = 'lg:hidden fixed top-4 left-4 p-2 bg-white/80 dark:bg-gray-800/80 rounded-lg shadow-lg z-50';
+        menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+        menuButton.onclick = toggleSidebar;
+        document.body.appendChild(menuButton);
+    }
 });
 
 renderTasks();
