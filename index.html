@@ -125,6 +125,17 @@
         </div>
         
         <div class="sidebar-content">
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium text-gray-700 dark:text-gray-300">Lists</h3>
+                    <button onclick="createNewList(prompt('Enter list name:'))" 
+                            class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="listSelector" class="space-y-2"></div>
+            </div>
+
             <div class="space-y-4 mb-8">
                 <div class="p-4 rounded-xl bg-white/80 dark:bg-gray-700/80 shadow-sm">
                     <p class="text-gray-600 dark:text-gray-300 mb-1">Total tasks</p>

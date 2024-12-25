@@ -1,14 +1,109 @@
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-tasks = tasks.map(task => ({...task, subtasks: task.subtasks || [], notes: task.notes || []}));
-let categories = JSON.parse(localStorage.getItem('categories')) || [
-    { name: 'personal', color: 'green' },
-    { name: 'work', color: 'blue' },
-    { name: 'shopping', color: 'orange' },
-    { name: 'other', color: 'purple' }
-];
+let taskLists = JSON.parse(localStorage.getItem('taskLists')) || [{
+    id: 'default',
+    name: 'My Tasks',
+    tasks: JSON.parse(localStorage.getItem('tasks')) || [],
+    categories: JSON.parse(localStorage.getItem('categories')) || [
+        { name: 'personal', color: 'green' },
+        { name: 'work', color: 'blue' },
+        { name: 'shopping', color: 'orange' },
+        { name: 'other', color: 'purple' }
+    ]
+}];
 
+let currentListId = localStorage.getItem('currentListId') || 'default';
 let currentFilter = 'all';
 const BASE_URL = window.location.origin + window.location.pathname;
+
+function getCurrentList() {
+    return taskLists.find(list => list.id === currentListId);
+}
+
+function saveTasks() {
+    localStorage.setItem('taskLists', JSON.stringify(taskLists));
+    localStorage.setItem('currentListId', currentListId);
+}
+
+function saveCategories() {
+    saveTasks();
+}
+
+function createNewList(name) {
+    const newList = {
+        id: 'list_' + Date.now(),
+        name: name,
+        tasks: [],
+        categories: [...getCurrentList().categories]
+    };
+    taskLists.push(newList);
+    currentListId = newList.id;
+    saveTasks();
+    renderLists();
+    renderTasks();
+}
+
+function deleteList(id) {
+    if (taskLists.length === 1) {
+        alert('Cannot delete the last list');
+        return;
+    }
+    
+    showConfirmDialog('Are you sure you want to delete this list?', () => {
+        const index = taskLists.findIndex(list => list.id === id);
+        taskLists.splice(index, 1);
+        if (currentListId === id) {
+            currentListId = taskLists[0].id;
+        }
+        saveTasks();
+        renderLists();
+        renderTasks();
+    });
+}
+
+function renameList(id) {
+    const list = taskLists.find(l => l.id === id);
+    showPromptDialog('Rename List', { text: list.name, description: '' }, (newName) => {
+        list.name = newName;
+        saveTasks();
+        renderLists();
+    });
+}
+
+function renderLists() {
+    const container = document.getElementById('listSelector');
+    container.innerHTML = taskLists.map(list => `
+        <div class="flex items-center gap-2 p-2 ${list.id === currentListId ? 
+            'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 
+            'bg-white/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-300'} 
+            rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition group shadow-sm">
+            <button onclick="switchList('${list.id}')" class="flex-1 text-left flex items-center gap-2">
+                <i class="fas fa-list-ul text-indigo-500 dark:text-indigo-400"></i>
+                <span>${list.name}</span>
+            </button>
+            <div class="flex gap-1">
+                <button onclick="renameList('${list.id}')" 
+                    class="p-1.5 rounded-lg hover:bg-indigo-200/50 dark:hover:bg-indigo-800/50 text-gray-500 dark:text-gray-400 hover:text-indigo-700 dark:hover:text-indigo-300">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteList('${list.id}')" 
+                    class="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function switchList(id) {
+    currentListId = id;
+    currentFilter = 'all';
+    saveTasks();
+    renderTasks();
+    renderFilterButtons();
+}
+
+let tasks = getCurrentList().tasks;
+tasks = tasks.map(task => ({...task, subtasks: task.subtasks || [], notes: task.notes || []}));
+let categories = getCurrentList().categories;
 
 function showConfirmDialog(message, onConfirm) {
     const modal = document.getElementById('confirmModal');
@@ -80,7 +175,7 @@ function addTask() {
     const task = input.value.trim();
     
     if (task) {
-        tasks.push({ 
+        getCurrentList().tasks.push({ 
             text: task,
             description: description.value.trim(), 
             completed: false,
@@ -107,26 +202,18 @@ function addTask() {
 }
 
 function toggleTask(index) {
-    tasks[index].completed = !tasks[index].completed;
-    tasks[index].completedDate = tasks[index].completed ? new Date().toISOString() : null;
+    getCurrentList().tasks[index].completed = !getCurrentList().tasks[index].completed;
+    getCurrentList().tasks[index].completedDate = getCurrentList().tasks[index].completed ? new Date().toISOString() : null;
     saveTasks();
     renderTasks();
 }
 
 function deleteTask(index) {
     showConfirmDialog('Are you sure you want to delete this task?', () => {
-        tasks.splice(index, 1);
+        getCurrentList().tasks.splice(index, 1);
         saveTasks();
         renderTasks();
     });
-}
-
-function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-}
-
-function saveCategories() {
-    localStorage.setItem('categories', JSON.stringify(categories));
 }
 
 function formatDeadline(deadline) {
@@ -169,10 +256,10 @@ function sortTasks(tasks, method) {
 }
 
 function editTask(index) {
-    const task = tasks[index];
+    const task = getCurrentList().tasks[index];
     showPromptDialog('Edit Task', task, (newText, newDescription) => {
-        tasks[index].text = newText;
-        tasks[index].description = newDescription;
+        getCurrentList().tasks[index].text = newText;
+        getCurrentList().tasks[index].description = newDescription;
         saveTasks();
         renderTasks();
     });
@@ -180,7 +267,7 @@ function editTask(index) {
 
 function searchTasks() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const filteredTasks = tasks.filter(task => 
+    const filteredTasks = getCurrentList().tasks.filter(task => 
         task.text.toLowerCase().includes(searchTerm) ||
         task.category.toLowerCase().includes(searchTerm)
     );
@@ -188,10 +275,10 @@ function searchTasks() {
 }
 
 function updateStatistics() {
-    const total = tasks.length;
-    const completed = tasks.filter(task => task.completed).length;
-    const totalSubtasks = tasks.reduce((acc, task) => acc + task.subtasks.length, 0);
-    const completedSubtasks = tasks.reduce((acc, task) => 
+    const total = getCurrentList().tasks.length;
+    const completed = getCurrentList().tasks.filter(task => task.completed).length;
+    const totalSubtasks = getCurrentList().tasks.reduce((acc, task) => acc + task.subtasks.length, 0);
+    const completedSubtasks = getCurrentList().tasks.reduce((acc, task) => 
         acc + task.subtasks.filter(st => st.completed).length, 0);
     const pending = total - completed;
 
@@ -216,7 +303,7 @@ function closeFilterModal() {
 
 function renderExistingFilters() {
     const container = document.getElementById('existingFilters');
-    container.innerHTML = categories.map((category, index) => `
+    container.innerHTML = getCurrentList().categories.map((category, index) => `
         <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
             <div class="flex items-center gap-2">
                 <span class="capitalize px-2 py-1 rounded-full text-xs font-medium dark:bg-opacity-20" 
@@ -235,7 +322,7 @@ function renderExistingFilters() {
 }
 
 function updateCategoryColor(index, color) {
-    categories[index].color = color;
+    getCurrentList().categories[index].color = color;
     saveCategories();
     renderExistingFilters();
     renderTasks();
@@ -245,8 +332,8 @@ function addNewFilter() {
     const name = document.getElementById('newFilterName').value.trim().toLowerCase();
     const color = document.getElementById('newFilterColor').value;
     
-    if (name && !categories.find(c => c.name === name)) {
-        categories.push({ name, color });
+    if (name && !getCurrentList().categories.find(c => c.name === name)) {
+        getCurrentList().categories.push({ name, color });
         saveCategories();
         renderExistingFilters();
         renderFilterButtons();
@@ -256,7 +343,7 @@ function addNewFilter() {
 
 function deleteCategory(index) {
     showConfirmDialog('Are you sure you want to delete this category? Tasks in this category will not be deleted.', () => {
-        categories.splice(index, 1);
+        getCurrentList().categories.splice(index, 1);
         saveCategories();
         renderExistingFilters();
         renderFilterButtons();
@@ -265,7 +352,7 @@ function deleteCategory(index) {
 
 function updateCategoryDropdowns() {
     const dropdowns = ['categorySelect'];
-    const options = categories.map(cat => 
+    const options = getCurrentList().categories.map(cat => 
         `<option value="${cat.name}">${cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>`
     ).join('');
     
@@ -285,7 +372,7 @@ function renderFilterButtons() {
             <i class="fas fa-tasks mr-2"></i>
             All Tasks
         </button>
-        ${categories.map(category => `
+        ${getCurrentList().categories.map(category => `
             <button class="filter-btn w-full text-left px-4 py-2 rounded-xl bg-white/80 dark:bg-gray-700/80 hover:bg-indigo-50 dark:hover:bg-gray-600 transition capitalize text-sm font-medium dark:text-gray-200" 
                     data-category="${category.name}">
                 <i class="fas fa-tag mr-2" style="color: ${category.color}"></i>
@@ -333,7 +420,7 @@ function renderTaskList(tasksToRender) {
     const sortMethod = document.getElementById('sortSelect').value;
     taskList.innerHTML = '';
     
-    const filteredTasks = filterTasks(tasksToRender || tasks);
+    const filteredTasks = filterTasks(tasksToRender || getCurrentList().tasks);
     const sortedTasks = sortTasks(filteredTasks, sortMethod);
     
     sortedTasks.forEach((task, index) => {
@@ -345,7 +432,7 @@ function renderTaskList(tasksToRender) {
             low: 'border-green-500'
         };
         
-        const taskCategory = categories.find(c => c.name === task.category) || { name: task.category, color: '#666666' };
+        const taskCategory = getCurrentList().categories.find(c => c.name === task.category) || { name: task.category, color: '#666666' };
         const categoryStyle = `background-color: ${taskCategory.color}25; color: ${taskCategory.color}`;
         
         li.className = `flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 ${priorityColors[task.priority]}`;
@@ -467,12 +554,13 @@ function renderTaskList(tasksToRender) {
 
 function renderTasks() {
     renderTaskList();
+    renderLists();
 }
 
 function exportTasks() {
     const data = {
-        tasks: tasks,
-        categories: categories
+        tasks: getCurrentList().tasks,
+        categories: getCurrentList().categories
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -494,9 +582,9 @@ function importTasks(input) {
                 const data = JSON.parse(e.target.result);
                 if (data.tasks && Array.isArray(data.tasks)) {
                     showConfirmDialog('This will replace all your current tasks and categories. Continue?', () => {
-                        tasks = data.tasks;
+                        getCurrentList().tasks = data.tasks;
                         if (data.categories && Array.isArray(data.categories)) {
-                            categories = data.categories;
+                            getCurrentList().categories = data.categories;
                         }
                         saveTasks();
                         saveCategories();
@@ -520,7 +608,7 @@ function exportToCalendar() {
         'PRODID:-//Taskara//Tasks Calendar//EN'
     ];
 
-    tasks.forEach(task => {
+    getCurrentList().tasks.forEach(task => {
         if (task.deadline) {
             const deadline = new Date(task.deadline);
             const duration = task.duration || 'PT1H';
@@ -553,7 +641,7 @@ function formatDateToICS(date) {
 }
 
 function toggleFavorite(index) {
-    tasks[index].favorite = !tasks[index].favorite;
+    getCurrentList().tasks[index].favorite = !getCurrentList().tasks[index].favorite;
     saveTasks();
     renderTasks();
 }
@@ -563,7 +651,7 @@ function addSubtask(parentIndex) {
     const subtaskText = input.value.trim();
     
     if (subtaskText) {
-        tasks[parentIndex].subtasks.push({
+        getCurrentList().tasks[parentIndex].subtasks.push({
             text: subtaskText,
             completed: false,
             completedDate: null
@@ -575,17 +663,17 @@ function addSubtask(parentIndex) {
 }
 
 function toggleSubtask(taskIndex, subtaskIndex) {
-    const subtask = tasks[taskIndex].subtasks[subtaskIndex];
+    const subtask = getCurrentList().tasks[taskIndex].subtasks[subtaskIndex];
     subtask.completed = !subtask.completed;
     subtask.completedDate = subtask.completed ? new Date().toISOString() : null;
     
-    const allSubtasksCompleted = tasks[taskIndex].subtasks.every(st => st.completed);
+    const allSubtasksCompleted = getCurrentList().tasks[taskIndex].subtasks.every(st => st.completed);
     if (allSubtasksCompleted) {
-        tasks[taskIndex].completed = true;
-        tasks[taskIndex].completedDate = new Date().toISOString();
+        getCurrentList().tasks[taskIndex].completed = true;
+        getCurrentList().tasks[taskIndex].completedDate = new Date().toISOString();
     } else {
-        tasks[taskIndex].completed = false;
-        tasks[taskIndex].completedDate = null;
+        getCurrentList().tasks[taskIndex].completed = false;
+        getCurrentList().tasks[taskIndex].completedDate = null;
     }
     
     saveTasks();
@@ -594,7 +682,7 @@ function toggleSubtask(taskIndex, subtaskIndex) {
 
 function deleteSubtask(taskIndex, subtaskIndex) {
     showConfirmDialog('Are you sure you want to delete this subtask?', () => {
-        tasks[taskIndex].subtasks.splice(subtaskIndex, 1);
+        getCurrentList().tasks[taskIndex].subtasks.splice(subtaskIndex, 1);
         saveTasks();
         renderTasks();
     });
@@ -605,7 +693,7 @@ function addNote(taskIndex) {
     const noteText = input.value.trim();
     
     if (noteText) {
-        tasks[taskIndex].notes.push({
+        getCurrentList().tasks[taskIndex].notes.push({
             text: noteText,
             createdAt: new Date().toISOString()
         });
@@ -617,7 +705,7 @@ function addNote(taskIndex) {
 
 function deleteNote(taskIndex, noteIndex) {
     showConfirmDialog('Are you sure you want to delete this note?', () => {
-        tasks[taskIndex].notes.splice(noteIndex, 1);
+        getCurrentList().tasks[taskIndex].notes.splice(noteIndex, 1);
         saveTasks();
         renderTasks();
     });
@@ -626,7 +714,7 @@ function deleteNote(taskIndex, noteIndex) {
 function checkRecurringTasks() {
     const today = new Date();
     
-    tasks.forEach(task => {
+    getCurrentList().tasks.forEach(task => {
         if (!task.recurring || task.recurring === 'none') return;
         
         const lastRecurrence = new Date(task.lastRecurrence);
@@ -669,7 +757,7 @@ function checkRecurringTasks() {
                 newTask.deadline = newDeadline.toISOString().split('T')[0];
             }
             
-            tasks.push(newTask);
+            getCurrentList().tasks.push(newTask);
             task.lastRecurrence = new Date().toISOString();
         }
     });
@@ -690,10 +778,10 @@ function initializeDragAndDrop() {
             
             taskArray.forEach(li => {
                 const taskIndex = parseInt(li.dataset.taskIndex);
-                newTasks.push(tasks[taskIndex]);
+                newTasks.push(getCurrentList().tasks[taskIndex]);
             });
             
-            tasks = newTasks;
+            getCurrentList().tasks = newTasks;
             saveTasks();
         }
     });
@@ -705,7 +793,7 @@ function showShareModal(taskIndex) {
     const includeSubtasks = document.getElementById('includeSubtasks');
     const includeNotes = document.getElementById('includeNotes');
     const includeStatus = document.getElementById('includeStatus');
-    const task = tasks[taskIndex];
+    const task = getCurrentList().tasks[taskIndex];
     
     const updateShareLink = () => {
         const shareData = {
@@ -834,7 +922,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }));
                 }
 
-                tasks.push(newTask);
+                getCurrentList().tasks.push(newTask);
                 saveTasks();
                 renderTasks();
                 window.history.replaceState({}, document.title, window.location.pathname);
