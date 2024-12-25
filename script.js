@@ -28,6 +28,7 @@ function saveCategories() {
 }
 
 function createNewList(name) {
+    if (!name) return;
     const newList = {
         id: 'list_' + Date.now(),
         name: name,
@@ -39,6 +40,38 @@ function createNewList(name) {
     saveTasks();
     renderLists();
     renderTasks();
+}
+
+function showNewListModal() {
+    const modal = document.getElementById('confirmModal');
+    const titleEl = document.getElementById('confirmTitle');
+    const messageEl = document.getElementById('confirmMessage');
+    const okButton = document.getElementById('confirmOk');
+    
+    titleEl.textContent = 'Create New List';
+    messageEl.innerHTML = `
+        <input type="text" id="newListInput" 
+            class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 dark:text-white mb-2" 
+            placeholder="Enter list name">
+    `;
+    okButton.textContent = 'Create';
+    okButton.className = 'px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700';
+    modal.classList.remove('hidden');
+    
+    const input = document.getElementById('newListInput');
+    input.focus();
+
+    document.getElementById('confirmCancel').onclick = () => {
+        modal.classList.add('hidden');
+    };
+
+    okButton.onclick = () => {
+        const name = input.value.trim();
+        if (name) {
+            createNewList(name);
+            modal.classList.add('hidden');
+        }
+    };
 }
 
 function deleteList(id) {
