@@ -99,7 +99,8 @@ function renameList(id, event) {
 function renderLists() {
     const container = document.getElementById('listSelector');
     container.innerHTML = taskLists.map(list => `
-        <div class="flex items-center gap-2 p-2 ${list.id === currentListId ? 
+        <div data-list-id="${list.id}" 
+            class="flex items-center gap-2 p-2 ${list.id === currentListId ? 
             'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 
             'bg-white/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-300'} 
             rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-[background-color] group shadow-sm">
@@ -794,25 +795,84 @@ function checkRecurringTasks() {
     renderTasks();
 }
 
+function moveTaskBetweenLists(fromListId, toListId, taskIndex) {
+    const fromList = taskLists.find(list => list.id === fromListId);
+    const toList = taskLists.find(list => list.id === toListId);
+    
+    if (fromList && toList) {
+        const task = fromList.tasks[taskIndex];
+        fromList.tasks.splice(taskIndex, 1);
+        toList.tasks.push(task);
+        saveTasks();
+        renderTasks();
+    }
+}
+
 function initializeDragAndDrop() {
     const taskList = document.getElementById('taskList');
+    const listContainer = document.getElementById('listSelector');
     new Sortable(taskList, {
         animation: 150,
         handle: '.drag-handle',
         ghostClass: 'bg-gray-100',
+        group: {
+            name: 'tasks',
+            pull: true,
+            put: true
+        },
         onEnd: function(evt) {
-            const taskArray = Array.from(taskList.children);
-            const newTasks = [];
-            
-            taskArray.forEach(li => {
-                const taskIndex = parseInt(li.dataset.taskIndex);
-                newTasks.push(getCurrentList().tasks[taskIndex]);
-            });
-            
-            getCurrentList().tasks = newTasks;
-            saveTasks();
+            if (evt.to === taskList) {
+                const taskArray = Array.from(taskList.children);
+                const newTasks = [];
+                taskArray.forEach(li => {
+                    const taskIndex = parseInt(li.dataset.taskIndex);
+                    newTasks.push(getCurrentList().tasks[taskIndex]);
+                });
+                getCurrentList().tasks = newTasks;
+                saveTasks();
+            }
         }
     });
+
+    const initializeList = (listEl) => {
+        const listId = listEl.dataset.listId;
+        if (!listId) return;
+
+        new Sortable(listEl, {
+            group: {
+                name: 'tasks',
+                put: true
+            },
+            animation: 150,
+            ghostClass: 'bg-gray-100',
+            onAdd: function(evt) {
+                const taskIndex = parseInt(evt.item.dataset.taskIndex);
+                const fromListId = currentListId;
+                const toListId = listId;
+                
+                if (fromListId && toListId && fromListId !== toListId) {
+                    moveTaskBetweenLists(fromListId, toListId, taskIndex);
+                }
+                evt.item.remove();
+            }
+        });
+    };
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1 && node.dataset.listId) {
+                        initializeList(node);
+                    }
+                });
+            }
+        });
+    });
+
+    observer.observe(listContainer, { childList: true });
+
+    document.querySelectorAll('[data-list-id]').forEach(initializeList);
 }
 
 function showShareModal(taskIndex) {
