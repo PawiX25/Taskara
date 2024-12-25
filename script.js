@@ -59,13 +59,41 @@ function deleteList(id) {
     });
 }
 
-function renameList(id) {
+function renameList(id, event) {
+    event.stopPropagation();
     const list = taskLists.find(l => l.id === id);
-    showPromptDialog('Rename List', { text: list.name, description: '' }, (newName) => {
-        list.name = newName;
-        saveTasks();
-        renderLists();
-    });
+    const modal = document.getElementById('confirmModal');
+    const titleEl = document.getElementById('confirmTitle');
+    const messageEl = document.getElementById('confirmMessage');
+    const okButton = document.getElementById('confirmOk');
+    
+    titleEl.textContent = 'Rename List';
+    messageEl.innerHTML = `
+        <input type="text" id="renameInput" 
+            class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 dark:text-white mb-2" 
+            value="${list.name}">
+    `;
+    okButton.textContent = 'Rename';
+    okButton.className = 'px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700';
+    modal.classList.remove('hidden');
+    
+    const input = document.getElementById('renameInput');
+    input.focus();
+    input.select();
+
+    document.getElementById('confirmCancel').onclick = () => {
+        modal.classList.add('hidden');
+    };
+
+    okButton.onclick = () => {
+        const newName = input.value.trim();
+        if (newName) {
+            list.name = newName;
+            saveTasks();
+            renderLists();
+            modal.classList.add('hidden');
+        }
+    };
 }
 
 function renderLists() {
@@ -74,13 +102,13 @@ function renderLists() {
         <div class="flex items-center gap-2 p-2 ${list.id === currentListId ? 
             'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 
             'bg-white/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-300'} 
-            rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition group shadow-sm">
+            rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-[background-color] group shadow-sm">
             <button onclick="switchList('${list.id}')" class="flex-1 text-left flex items-center gap-2">
                 <i class="fas fa-list-ul text-indigo-500 dark:text-indigo-400"></i>
-                <span>${list.name}</span>
+                <span class="transition-none">${list.name}</span>
             </button>
             <div class="flex gap-1">
-                <button onclick="renameList('${list.id}')" 
+                <button onclick="renameList('${list.id}', event)" 
                     class="p-1.5 rounded-lg hover:bg-indigo-200/50 dark:hover:bg-indigo-800/50 text-gray-500 dark:text-gray-400 hover:text-indigo-700 dark:hover:text-indigo-300">
                     <i class="fas fa-edit"></i>
                 </button>
