@@ -296,10 +296,14 @@ function editTask(index) {
 
 function searchTasks() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const filteredTasks = getCurrentList().tasks.filter(task => 
-        task.text.toLowerCase().includes(searchTerm) ||
-        task.category.toLowerCase().includes(searchTerm)
-    );
+    const filteredTasks = getCurrentList().tasks.filter(task => {
+        const textMatch = task.text.toLowerCase().includes(searchTerm);
+        const categoryMatch = task.category.toLowerCase().includes(searchTerm);
+        const descriptionMatch = task.description && task.description.toLowerCase().includes(searchTerm);
+        const subtaskMatch = task.subtasks.some(st => st.text.toLowerCase().includes(searchTerm));
+        const notesMatch = task.notes.some(note => note.text.toLowerCase().includes(searchTerm));
+        return textMatch || categoryMatch || descriptionMatch || subtaskMatch || notesMatch;
+    });
     renderTaskList(filteredTasks);
 }
 
