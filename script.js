@@ -99,15 +99,15 @@ function renameList(id, event) {
 function renderLists() {
     const container = document.getElementById('listSelector');
     container.innerHTML = taskLists.map(list => `
-        <div data-list-id="${list.id}" 
+        <div onclick="switchList('${list.id}')" data-list-id="${list.id}" 
             class="flex items-center gap-2 p-2 ${list.id === currentListId ? 
             'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 
             'bg-white/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-300'} 
-            rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-[background-color] group shadow-sm">
-            <button onclick="switchList('${list.id}')" class="flex-1 text-left flex items-center gap-2">
+            rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-[background-color] group shadow-sm cursor-pointer">
+            <div class="flex-1 text-left flex items-center gap-2">
                 <i class="fas fa-list-ul text-indigo-500 dark:text-indigo-400"></i>
                 <span class="transition-none">${list.name}</span>
-            </button>
+            </div>
             <div class="flex gap-1">
                 <button onclick="renameList('${list.id}', event)" 
                     class="p-1.5 rounded-lg hover:bg-indigo-200/50 dark:hover:bg-indigo-800/50 text-gray-500 dark:text-gray-400 hover:text-indigo-700 dark:hover:text-indigo-300">
