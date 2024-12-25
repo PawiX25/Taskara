@@ -452,6 +452,17 @@ function renderTaskList(tasksToRender) {
     const filteredTasks = filterTasks(tasksToRender || getCurrentList().tasks);
     const sortedTasks = sortTasks(filteredTasks, sortMethod);
     
+    if (sortedTasks.length === 0) {
+        taskList.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+                <i class="fas fa-tasks text-4xl mb-4"></i>
+                <p class="text-lg font-medium mb-2">No tasks found</p>
+                <p class="text-sm">Click the + button to add a new task</p>
+            </div>
+        `;
+        return;
+    }
+    
     sortedTasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.dataset.taskIndex = index;
