@@ -319,12 +319,46 @@ function sortTasks(tasks, method) {
 
 function editTask(index) {
     const task = getCurrentList().tasks[index];
-    showPromptDialog('Edit Task', task, (newText, newDescription) => {
-        getCurrentList().tasks[index].text = newText;
-        getCurrentList().tasks[index].description = newDescription;
+    const modal = document.getElementById('editTaskModal');
+    
+    updateCategoryDropdowns();
+    
+    document.getElementById('editTaskInput').value = task.text;
+    document.getElementById('editTaskDescription').value = task.description || '';
+    document.getElementById('editDeadlineInput').value = task.deadline || '';
+    document.getElementById('editDurationInput').value = task.duration || '';
+    document.getElementById('editPrioritySelect').value = task.priority;
+    document.getElementById('editCategorySelect').value = task.category;
+    document.getElementById('editRecurringSelect').value = task.recurring || 'none';
+    
+    modal.classList.remove('hidden');
+    document.getElementById('editTaskInput').focus();
+
+    document.getElementById('editTaskForm').onsubmit = (e) => {
+        e.preventDefault();
+        
+        getCurrentList().tasks[index] = {
+            ...task,
+            text: document.getElementById('editTaskInput').value.trim(),
+            description: document.getElementById('editTaskDescription').value.trim(),
+            deadline: document.getElementById('editDeadlineInput').value,
+            duration: document.getElementById('editDurationInput').value,
+            priority: document.getElementById('editPrioritySelect').value,
+            category: document.getElementById('editCategorySelect').value,
+            recurring: document.getElementById('editRecurringSelect').value,
+            modifiedAt: new Date().toISOString()
+        };
+        
         saveTasks();
         renderTasks();
-    });
+        closeEditTaskModal();
+    };
+}
+
+function closeEditTaskModal() {
+    const modal = document.getElementById('editTaskModal');
+    modal.classList.add('hidden');
+    document.getElementById('editTaskForm').reset();
 }
 
 function searchTasks() {
@@ -417,7 +451,7 @@ function deleteCategory(index) {
 }
 
 function updateCategoryDropdowns() {
-    const dropdowns = ['categorySelect'];
+    const dropdowns = ['categorySelect', 'editCategorySelect'];
     const options = getCurrentList().categories.map(cat => 
         `<option value="${cat.name}">${cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>`
     ).join('');
