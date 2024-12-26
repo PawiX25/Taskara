@@ -60,6 +60,13 @@ Taskara is a sleek and intuitive to-do list application designed to help you man
   - Ctrl + F: Focus search
   - Esc: Close modals
 
+- **List Management**
+  - Create multiple task lists
+  - Rename and delete lists
+  - Switch between different lists
+  - Tasks can be moved between lists via drag and drop
+  - Lists maintain their own categories
+
 ## Getting Started
 
 ### Prerequisites
